@@ -1,1 +1,10 @@
 shp/
+*.shp
+*.dbf
+*.sbn
+*.sbx
+*.shp.xml
+*.shx
+*.zip
+*.gz
+*.bz2
