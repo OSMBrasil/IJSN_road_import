@@ -13,7 +13,7 @@ From the urban file things are much more complicated. Here it is needed to check
 Projection
 =============
 
-The Shapefiles presented are as downloaded from [IJSN website](http://www.ijsn.es.gov.br/Sitio/index.php?option=com_content&view=article&id=3780&Itemid=330). They are presented in [SIRGAS 2000] projection, which is close to, but not exactly the same as [WGS84]. Shapes should be converted to WGS84 before final product and upload.
+The Shapefiles presented are as downloaded from [IJSN website](http://www.ijsn.es.gov.br/Sitio/index.php?option=com_content&view=article&id=3780&Itemid=330). They are presented in [SIRGAS 2000](http://georepository.com/crs_4674/SIRGAS-2000.html) projection, which is close to, but not exactly the same as [WGS84](http://georepository.com/crs_4979/WGS-84.html). Shapes should be converted to WGS84 before final product and upload.
 
 Requirements
 ==============
