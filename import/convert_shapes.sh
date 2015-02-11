@@ -1,7 +1,7 @@
 #!/bin/sh
 
 unzip Arruamento.zip -d streets
-unzip Trecho_Rodoviario.zip -d highways
+#unzip Trecho_Rodoviario.zip -d highways
 
 # convert to WGS84, selecting fields and streets with name value
 ogr2ogr -select 'nome, revestimen, nrFaixas, municipio' \
