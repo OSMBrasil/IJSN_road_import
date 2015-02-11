@@ -1,3 +1,6 @@
+Arruamento.shp
+=========
+
 This document contains Shapefile fields, values, and how to interpret them
 
 CEP
@@ -38,6 +41,14 @@ The following values: `Acesso`, `Alameda`, `Avenida`, `Beco`, `Caminho`, `Ciclov
 `Acesso` and `Rampa` should be tagged as `_link` of the category of the way with highest class connected to it
 
 `Viaduto` should be tagged `bridge=viaduct` + `layer=1`
+
+If `Praça` forms a closed area, the tag `area=yes` should be added. These objects should be listed in a separate log file so they can be controlled to see if a `multipoligon` should be created (i.e. a garden in the middle of the square or similar).
+
+`Beco` should in most cases be `highway=pedestrian`, but might also be `highway=service` + `service=alley`
+
+`Via`, `Estrada` and `Rua` outside populated areas, not previously mapped should be `highway=unclassified`
+
+All other roads not previously mapped should be `highway=residential`
 
 extenM
 =======
@@ -98,3 +109,4 @@ fonte
 ======
 
 `CGEO/IJSN`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag.
+
