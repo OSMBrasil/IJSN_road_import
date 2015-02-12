@@ -1,4 +1,5 @@
 shp/
+!shp/README.md
 *.shp
 *.dbf
 *.sbn
