@@ -107,7 +107,7 @@ Two values, `NULL` and `Restituição` - ignore
 fonte
 ======
 
-`CGEO/IJSN`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag.
+`CGEO/IJSN`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`.
 
 Trecho_Rodoviario_ES.shp
 =======
@@ -230,4 +230,4 @@ Source date, all is `03/08/2012`, already traced data from `DER-ES` is of newer 
 fonte
 =====
 
-`IJSN/DER-ES`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag.
+`IJSN/DER-ES`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`.

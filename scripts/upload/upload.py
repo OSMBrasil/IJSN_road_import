@@ -24,7 +24,7 @@
 Uploads complete osmChange 0.3 files.  Use your login (not email) as username.
 """
 
-__version__ = "$Revision: 21.1 $"
+__version__ = "$Revision: 21 IJSN $"
 
 import os
 import subprocess
