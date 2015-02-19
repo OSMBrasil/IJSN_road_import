@@ -19,20 +19,37 @@
 
 
 unzip ../shp/Arruamento.zip -d ../shp/streets
-#unzip Trecho_Rodoviario.zip -d highways
 
 # convert to WGS84, selecting fields and streets with name value
-ogr2ogr -select 'nome, revestimen, nrFaixas, municipio' \
+ogr2ogr -select 'nome, revestimen, nrFaixas, municipio, tipoArruam' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'nome is not null' \
     -f 'ESRI Shapefile' ../shp/streets/streets.shp \
     ../shp/streets/Arruamento.shp
 
 # convert to WGS84, selecting fields and streets with no name value
-ogr2ogr -select 'nome, revestimen, nrFaixas, municipio' \
+ogr2ogr -select 'nome, revestimen, nrFaixas, municipio, tipoArruam' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'nome is null' \
     -f 'ESRI Shapefile' ../shp/streets/streets-no-name.shp \
     ../shp/streets/Arruamento.shp
 
 rm ../shp/streets/Arruamento.*
+
+unzip ../shp/Trecho_Rodoviario.zip -d ../shp/highways
+
+# convert to WGS84, selecting fields and streets with name value
+ogr2ogr -select 'nome, nomePop, revestim, nrFaixas, municipio, tipoTrech' \
+    -a_srs EPSG:4326 -t_srs EPSG:4326 \
+    -where 'nome is not null' \
+    -f 'ESRI Shapefile' ../shp/highways/highways.shp \
+    ../shp/highways/Trecho_Rodoviario_ES.shp
+
+# convert to WGS84, selecting fields and streets with no name value
+ogr2ogr -select 'nome, nomePop, revestim, nrFaixas, municipio, tipoTrech' \
+    -a_srs EPSG:4326 -t_srs EPSG:4326 \
+    -where 'nome is null' \
+    -f 'ESRI Shapefile' ../shp/highways/highways-no-name.shp \
+    ../shp/highways/Trecho_Rodoviario_ES.shp
+
+rm ../shp/highways/Trecho_Rodoviario_ES.*

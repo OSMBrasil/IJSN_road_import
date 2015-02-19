@@ -121,7 +121,7 @@ nome
 
 `Estrada Municipal` shold be treated as `NULL`
 
-Names starting with `Rod.` should be changed to `Rodoviario` followed by the name: `Rodoviario Audifax Barcelos Neves`
+Names starting with `Rod.` should be changed to `Rodovia` followed by the name: `Rodovia Audifax Barcelos Neves`
 
 nomePop
 ======
