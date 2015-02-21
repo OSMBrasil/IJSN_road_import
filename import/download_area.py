@@ -18,6 +18,7 @@
 # Dependency: overpass-api-python-wrapper: see https://github.com/mvexel/overpass-api-python-wrapper
 import overpass
 import sys
+import json
 
 api = overpass.API()
 
@@ -46,5 +47,36 @@ print("You have entered: ", area)
     20:28 wille: tipo brasília: eu uso esse comando
     """
 #highways = api.Get('way["highway"] in $area')
+searchString = 'relation["boundary"="administrative"]["admin_level"="8"]["name"="'+area+'"]'
+#print(searchString)
+city = api.Get(searchString)
 
+filename = "../shp/debug.json"
+f = open(filename, 'w')
+f.write(str(city))
+f.close()
+
+# Now to get the relation ID from the output
+cityID = 1828867 # tricky formula (relation for Divino de São Lourenço)
+#print("Default cityID (before extracting from query): "+str(cityID))
+jsonString = json.dumps(city)
+IDsource = json.loads(jsonString)
+myElements = json.dumps(IDsource['elements'])
+IDsource = json.loads(myElements)
+myID = json.dumps(IDsource[0][u'id'])
+cityID = int(myID)
+#print("Now the value of cityID have changed: "+str(cityID))
+cityID = cityID + 3600000000
+
+api = overpass.API(timeout=600)
+#api = overpass.API(responseformat=xml) # OSM XML output -- not supported in wrapper at the moment
+
+searchString = 'way(area:'+str(cityID)+')["highway"]'
+#print(searchString)
+highways = api.Get(searchString)
+
+filename = "../shp/osm/"+area+".json"
+f = open(filename, 'w')
+f.write(str(highways))
+f.close()
 
