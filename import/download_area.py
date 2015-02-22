@@ -22,9 +22,6 @@ import json
 
 api = overpass.API()
 
-print("Welcome to download_area.py")
-print("This program is made to download all highways with accosiated nodes and relations within a defined area")
-
 __version__ = "$Revision: 1 $"
 
 area = "Unset"
@@ -36,36 +33,20 @@ else:
     area = sys.argv[1]
 
 
-print("You have entered: ", area)
+#print("You have entered: ", area)
 
 # Building overpass query
-"""
-    20:26 Skippern-MWS: tem duvida que highways = api.Get('way["highway"] in $area') vai dar certo
-    20:27 wille: @skippern-mws tem um segredo: pega o id da relação do municipio que vc quer
-    20:27 wille: e soma com 3600000000
-    20:28 Skippern-MWS: entao pega nome do municipio do shapefile ou um lista, buscar o id do relacao, e entrar no query?
-    20:28 wille: tipo brasília: eu uso esse comando
-    """
-#highways = api.Get('way["highway"] in $area')
-searchString = 'relation["boundary"="administrative"]["admin_level"="8"]["name"="'+area+'"]'
-#print(searchString)
+searchString = 'relation["boundary"="administrative"]["admin_level"="8"]["name"="'+area+'"](-21.5,-42.0,-17.5,-39.0)'
 city = api.Get(searchString)
-
-filename = "../shp/debug.json"
-f = open(filename, 'w')
-f.write(str(city))
-f.close()
 
 # Now to get the relation ID from the output
 cityID = 1828867 # tricky formula (relation for Divino de São Lourenço)
-#print("Default cityID (before extracting from query): "+str(cityID))
 jsonString = json.dumps(city)
 IDsource = json.loads(jsonString)
 myElements = json.dumps(IDsource['elements'])
 IDsource = json.loads(myElements)
 myID = json.dumps(IDsource[0][u'id'])
 cityID = int(myID)
-#print("Now the value of cityID have changed: "+str(cityID))
 cityID = cityID + 3600000000
 
 api = overpass.API(timeout=600)
