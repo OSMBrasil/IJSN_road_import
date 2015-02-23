@@ -138,33 +138,37 @@ while feature:
     if (feature.GetField("tipoTrech") == "Caminhos do Campo"): feature.SetField("highway", "track")
     ref = ""
     name = feature.GetField("nome")
+    if (name != None): name = name.replace("BR- ", "BR-")
     if (name == "Estrada Municipal"): name = None
     if (name != None):
         if (name.find(" Projetada") > 0):
             name = None
     if (name != None):
-        if (name.find("BR") > -1):
+        if (name.find("BR-") > -1):
             ref = ref + " " + name
             name = None
     if (name != None):
-        if (name.find("ES") > -1):
+        if (name.find("ES-") > -1):
             ref = ref + " " + name
             name = None
     altName = feature.GetField("nomePop")
+    if (altName != None): altName = altName.replace("BR- ", "BR-")
     if (altName == "Estrada Municipal"): altName = None
     if (altName != None):
         if (len(altName) < 3):
             ref = ref + " " + altName
             altName = None
     if (altName != None):
-        if (altName.find("BR") > -1):
+        if (altName.find("BR-") > -1):
             ref = ref + " " + altName
             altName = None
     if (altName != None):
-        if (altName.find("ES") > -1):
+        if (altName.find("ES-") > -1):
             ref = ref + " " + altName
             altName = None
-    ref = ref.replace("/", " / ")
+    ref = ref.replace("/", " - ")
+    ref = ref.replace(" - ", "-")
+    ref = ref.replace("-ES", "- ES")
     myRefs = ref.split()
     ref = ""
     junk = []
@@ -177,16 +181,20 @@ while feature:
         else: newRef.append(myRefs[i])
     newRef = list(set(newRef))
     newRef.sort()
+    junkCombined = ""
     if (len(newRef) > 0): ref = ';'.join(newRef)
     if (len(junk) > 0):
-        junkCombined = ' '.join(junk)
+        junkCombined = str(" ".join(junk))
+        junkCombined = junkCombined.replace("-", " - ")
         if (altName != None):
             altName = altName + ";" + junkCombined
-        else: altname = junkCombined
+        else: altName = junkCombined
     if (name != None):
         name = name.replace("Rod.", "Rodovia")
         name = name.replace("Faz.", "Fazenda")
+        name = name.replace("Estr.", "Estrada")
         name = name.replace("Faz ", "Fazenda ")
+        name = name.replace("Com ", "Comunidade ")
         name = name.replace("Comun.", "Comunidade")
         name = name.replace("Laborat.", "Laboratorio")
         name = name.replace("S.", "São")
@@ -194,7 +202,9 @@ while feature:
     if (altName != None):
         altName = altName.replace("Rod.", "Rodovia")
         altName = altName.replace("Faz.", "Fazenda")
+        altName = altName.replace("Estr.", "Estrada")
         altName = altName.replace("Faz ", "Fazenda ")
+        altName = altName.replace("Com ", "Comunidade ")
         altName = altName.replace("Comun.", "Comunidade")
         altName = altName.replace("Laborat.", "Laboratorio")
         altName = altName.replace("S.", "São")
