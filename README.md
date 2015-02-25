@@ -1,14 +1,14 @@
 IJSN Road Import
 =============
 
-The purpose of this project is to work with the two supplied shapefiles in order to extract the useful information and add to the OpenStreetMap database. This import is complicated as most of the affected roads already exist in the database, and many of them already are named, maybe with different spelling of the same name, or with different extension of the name. There might also be some conflicts in surface, but occational conflict might also appear on lanes.
+The purpose of this project is to work with the two supplied shapefiles in order to extract the useful information and add to the OpenStreetMap database. This import is complicated as most of the affected roads already exist in the database, and many of them already are named, maybe with different spelling of the same name, or with different extension of the name. There might also be some conflicts in surface, but occational conflict might also appear on lanes. For documentation there is a [wiki page](http://wiki.openstreetmap.org/wiki/Esp%C3%ADrito_Santo_%28state%29/IJSN_road_import) for the import.
 
 What is to import?
 ==============
 
 From the highway file, only `name` if it is not something with reference to the `ref` tag, if a `name` tag exist than no value will be imported, and fill in missing `surface`, which should affect only a few minor trenches. `lanes` should also be added.
 
-From the urban file things are much more complicated. Here it is needed to check names in a much more complicated way. First the data in the shapefile must be extended so that the `name` values starting with *R.* are exchanged with *Rua* and *Av.* with *Avenida*. Next step will be to compare the names with the ones existing in OSM, if there is a difference in the spelling or in the name we need to establish rules how to handle the cases. The tags `surface` and `lanes` are treated the same way as for highways, just that there will be more of it.
+From the urban file things are much more complicated. Here it is needed to check names in a much more complicated way. First the data in the shapefile must be extended so that the `name` values starting with *R.* are exchanged with *Rua* and *Av.* with *Avenida*. Next step will be to compare the names with the ones existing in OSM, if there is a difference in the spelling or in the name we need to establish rules how to handle the cases. The tags `surface` and `lanes` are treated the same way as for highways, just that there will be more of it. [See here](https://github.com/OSMBrasil/IJSN_road_import/blob/master/FIELDS.md) for full details about the datas in the shapefiles.
 
 Projection
 =============
