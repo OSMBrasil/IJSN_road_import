@@ -58,6 +58,6 @@ highways = api.Get(searchString)
 
 filename = "../shp/osm/"+area+".json"
 f = open(filename, 'w')
-f.write(str(highways))
+f.write(json.dumps(highways))
 f.close()
 
