@@ -52,7 +52,7 @@ cityID = cityID + 3600000000
 api = overpass.API(timeout=600)
 #api = overpass.API(responseformat=xml) # OSM XML output -- not supported in wrapper at the moment
 
-searchString = 'way(area:'+str(cityID)+')["highway"]'
+searchString = 'way(area:'+str(cityID)+')["highway"]; out body; >; out skel qt;'
 #print(searchString)
 highways = api.Get(searchString)
 
