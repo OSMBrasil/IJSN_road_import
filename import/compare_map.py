@@ -53,6 +53,8 @@ print(" Ways: " + str(len(wayList)) )
 print("Nodes: " +str(len(nodeList)))
 
 JSONwayLength = 0
+namedWayLength = 0
+unNamedWayLength = 0
 
 #here we need to make the way objects
 for way in wayList:
@@ -73,9 +75,15 @@ for way in wayList:
         tmp = ( i[0] , i[1] )
         tmpA.append(tmp)
     thisWay = LineString(tmpA)
-    JSONwayLength = JSONwayLength + (thisWay.length * 60 * 1850)
+    JSONwayLength = JSONwayLength + (thisWay.length * 60 * 1852)
+    try:
+        name = tags['name']
+        namedWayLength = namedWayLength + (thisWay.length * 60 * 1852)
+    except:
+        unNamedWayLength = unNamedWayLength + (thisWay.length * 60 * 1852)
 
-print("Total length of ways in JSON file: " + str(JSONwayLength / 1000) + "km (avg way lenght: " + str(JSONwayLength / len(wayList)) + "m / node distane: " + str(JSONwayLength / len(nodeList)) + "m)")
+print("Total length of ways in JSON file: " + ('%.3f' % (JSONwayLength / 1000)) + "km (avg way lenght: " + ('%.2f' % (JSONwayLength / len(wayList))) + "m / node distane: " + ('%.2f' % (JSONwayLength / len(nodeList))) + "m)")
+print("Named way: " + ('%.3f' % (namedWayLength / 1000)) + "km, unnamed: " + ('%.3f' % (unNamedWayLength / 1000)) + "km")
 
 #s = shape(json.loads(nodeList[0]))
 #print(s)
