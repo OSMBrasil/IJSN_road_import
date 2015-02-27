@@ -110,6 +110,10 @@ while feature:
         feature.SetField("highway", "tertiary")
         feature.SetField("junction", "yes")
     if (feature.GetField("situacFisi") == "Projetada"): feature.SetField("highway", "proposed")
+    municipio = feature.GetField("municipio")
+    if (municipio != None):
+        municipio = municipio.replace(' ', '')
+        feature.SetField("municipio", municipio)
     layer.SetFeature(feature)
     feature = layer.GetNextFeature()
 

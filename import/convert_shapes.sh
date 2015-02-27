@@ -24,34 +24,38 @@ unzip -o ../shp/Trecho_Rodoviario.zip -d ../shp/highways
 ./shapefile_process.py
 
 # convert to WGS84, selecting fields and streets with name value
-ogr2ogr -select 'name, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
+ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'name is not null' -overwrite \
     -f 'ESRI Shapefile' ../shp/streets/streets.shp \
     ../shp/streets/Arruamento.shp
 
 # convert to WGS84, selecting fields and streets with no name value
-ogr2ogr -select 'name, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
+ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'name is null' -overwrite \
     -f 'ESRI Shapefile' ../shp/streets/streets-no-name.shp \
     ../shp/streets/Arruamento.shp
 
-rm ../shp/streets/Arruamento.*
-
-
 # convert to WGS84, selecting fields and streets with name value
-ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway' \
+ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'name is not null' -overwrite \
     -f 'ESRI Shapefile' ../shp/highways/highways.shp \
     ../shp/highways/Trecho_Rodoviario_ES.shp
 
 # convert to WGS84, selecting fields and streets with no name value
-ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway' \
+ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \
     -where 'name is null' -overwrite \
     -f 'ESRI Shapefile' ../shp/highways/highways-no-name.shp \
     ../shp/highways/Trecho_Rodoviario_ES.shp
 
+# merging
+ogr2ogr -overwrite -f 'ESRI Shapefile' ../shp/Total_highways.shp ../shp/streets/streets.shp
+ogr2ogr -f 'ESRI Shapefile' -update -append ../shp/Total_highways.shp ../shp/streets/streets-no-name.shp -nln Total_highways
+ogr2ogr -f 'ESRI Shapefile' -update -append ../shp/Total_highways.shp ../shp/highways/highways.shp -nln Total_highways
+ogr2ogr -f 'ESRI Shapefile' -update -append ../shp/Total_highways.shp ../shp/highways/highways-no-name.shp -nln Total_highways
+
+rm ../shp/streets/Arruamento.*
 rm ../shp/highways/Trecho_Rodoviario_ES.*

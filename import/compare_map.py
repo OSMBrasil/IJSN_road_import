@@ -37,10 +37,14 @@ else:
 nodeList = []
 wayList = []
 
-print("Loading data from "+jsonfile)
+#print("Loading data from "+jsonfile)
 
 data=open(jsonfile)
 jsonFull = json.load(data)
+data.close()
+
+data=open(shapefile)
+shapeFull = json.load(data)
 data.close()
 
 for element in jsonFull['elements']:
@@ -55,6 +59,9 @@ print("Nodes: " +str(len(nodeList)))
 JSONwayLength = 0
 namedWayLength = 0
 unNamedWayLength = 0
+ShapeWayLength = 0
+ShapeNamedWay = 0
+ShapeUnnamedWay = 0
 
 #here we need to make the way objects
 for way in wayList:
@@ -82,8 +89,23 @@ for way in wayList:
     except:
         unNamedWayLength = unNamedWayLength + (thisWay.length * 60 * 1852)
 
+for way in shapeFull['features']:
+    tags = way["properties"]
+    myNodes = [ ]
+    for wayNode in way["geometry"]["coordinates"]:
+        myNodes.append( ( wayNode[0], wayNode[1] ))
+    thisWay = LineString(myNodes)
+    ShapeWayLength = ShapeWayLength + (thisWay.length * 60 * 1852)
+    name = tags['name']
+    if (name != None):
+        ShapeNamedWay = ShapeNamedWay + (thisWay.length * 60 * 1852)
+    else:
+        ShapeUnnamedWay = ShapeUnnamedWay + (thisWay.length * 60 * 1852)
+
 print("Total length of ways in JSON file: " + ('%.3f' % (JSONwayLength / 1000)) + "km (avg way lenght: " + ('%.2f' % (JSONwayLength / len(wayList))) + "m / node distane: " + ('%.2f' % (JSONwayLength / len(nodeList))) + "m)")
 print("Named way: " + ('%.3f' % (namedWayLength / 1000)) + "km, unnamed: " + ('%.3f' % (unNamedWayLength / 1000)) + "km")
+print("Total length of ways in Shapefile: " + ('%.3f' % (ShapeWayLength / 1000)) + "km")
+print("Named way: " + ('%.3f' % (ShapeNamedWay / 1000)) + "km, unnamed: " + ('%.3f' % (ShapeUnnamedWay / 1000)) + "km")
 
 #s = shape(json.loads(nodeList[0]))
 #print(s)
