@@ -62,7 +62,8 @@ unNamedWayLength = 0
 ShapeWayLength = 0
 ShapeNamedWay = 0
 ShapeUnnamedWay = 0
-
+OverpassWays = []
+ShapeWays = []
 #here we need to make the way objects
 for way in wayList:
     tags = way["tags"]
@@ -79,8 +80,7 @@ for way in wayList:
     #lets create a way
     tmpA = []
     for i in myNodes:
-        tmp = ( i[0] , i[1] )
-        tmpA.append(tmp)
+        tmpA.append( ( i[0] , i[1] ) )
     thisWay = LineString(tmpA)
     JSONwayLength = JSONwayLength + (thisWay.length * 60 * 1852)
     try:
@@ -88,6 +88,7 @@ for way in wayList:
         namedWayLength = namedWayLength + (thisWay.length * 60 * 1852)
     except:
         unNamedWayLength = unNamedWayLength + (thisWay.length * 60 * 1852)
+    OverpassWays.append(thisWay)
 
 for way in shapeFull['features']:
     tags = way["properties"]
@@ -101,12 +102,41 @@ for way in shapeFull['features']:
         ShapeNamedWay = ShapeNamedWay + (thisWay.length * 60 * 1852)
     else:
         ShapeUnnamedWay = ShapeUnnamedWay + (thisWay.length * 60 * 1852)
+    ShapeWays.append(thisWay)
 
 print("Total length of ways in JSON file: " + ('%.3f' % (JSONwayLength / 1000)) + "km (avg way lenght: " + ('%.2f' % (JSONwayLength / len(wayList))) + "m / node distane: " + ('%.2f' % (JSONwayLength / len(nodeList))) + "m)")
 print("Named way: " + ('%.3f' % (namedWayLength / 1000)) + "km, unnamed: " + ('%.3f' % (unNamedWayLength / 1000)) + "km")
-print("Total length of ways in Shapefile: " + ('%.3f' % (ShapeWayLength / 1000)) + "km")
+print("Total length of ways in Shapefile: " + ('%.3f' % (ShapeWayLength / 1000)) + "km (" + str(len(ShapeWays)) + " ways)")
 print("Named way: " + ('%.3f' % (ShapeNamedWay / 1000)) + "km, unnamed: " + ('%.3f' % (ShapeUnnamedWay / 1000)) + "km")
 
-#s = shape(json.loads(nodeList[0]))
-#print(s)
-#print(json.dumps(mapping(s)))
+newNodes = []
+newWays = []
+modifiedWays = []
+createXML = ""
+modifyXML = ""
+
+# Time to starte analyse
+for Oway in wayList:
+    tags = Oway["tags"]
+    myNodes = []
+    for wayNode in Oway["nodes"]:
+        thisNode = False
+        nodeIndex = 0
+        while (thisNode == False):
+            if (nodeJSON['nodes'][nodeIndex]['id'] == wayNode):
+                myNodes.append(nodeJSON['nodes'][nodeIndex]["coordinates"])
+                nodeIndex = nodeIndex + 1
+                thisNode = True
+            else: nodeIndex = nodeIndex + 1
+    tmpA = []
+    for i in myNodes:
+        tmpA.append(( i[0] , i[1] ))
+    thisOWay = LineString(tmpA)
+    for Sway in shapeFull['features']:
+        myNodes = []
+        for wayNode in Sway['geometry']['coordinates']:
+            myNodes.append( ( wayNode[0], wayNode[1] ) )
+        thisSWay = LineString(myNodes)
+    # compare the two ways
+
+osmChange = '<osmChange version="0.6" generator="IJSN importer">\n<create>' + createXML + '</create>\n<modify>' + modifyXML + '</modify>\n</osmChange>'
