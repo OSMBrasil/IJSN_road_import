@@ -6,5 +6,4 @@ Shapefiles are downloaded from [IJSN website](http://www.ijsn.es.gov.br/Sitio/in
 Scripts
 ========
 
-* [shp2osm](http://svn.openstreetmap.org/applications/utils/import/shp2osm/)
 * [upload](http://svn.openstreetmap.org/applications/utils/import/bulkupload/)
