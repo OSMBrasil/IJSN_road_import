@@ -18,7 +18,6 @@
 import sys
 import ogr
 import json
-#import shapely
 from shapely.geometry import shape, mapping, LineString
 
 if len(sys.argv) < 3:
@@ -222,10 +221,10 @@ for Oway in wayList:
             myNodes.append( ( wayNode[0], wayNode[1] ) )
         thisSWay = LineString(myNodes)
         # compare the two ways
-        if thisOWay.within(thisSWay.buffer(0.1)):
+        if thisOWay.within(thisSWay.buffer(0.000089)):
             #print ("O", end=''),
             waysAreEqual = 1
-#        if thisSWay.within(thisOWay.buffer(0.1)):
+#        if thisSWay.within(thisOWay.buffer(0.000089)):
 #            print ("S", end=''),
         if thisOWay.almost_equals(thisSWay, 5):
             #print ("5", end=''),
@@ -248,7 +247,8 @@ for Oway in wayList:
         if (waysAreEqual == 1):
             if (Sname != Oname):
                 iChanged = 1
-                if (OaltName != None): OaltName = Oname + ";" + OaltName
+                if (OaltName != None):
+                    if (Oname != None): OaltName = Oname + ";" + OaltName
                 elif (Oname == Sname): break
                 else: OaltName = Oname
                 Oname = Sname
@@ -305,7 +305,6 @@ for Oway in wayList:
             iChanged = 0
             break
 
-print (" ")
 
 print ("New ways created: " + str(len(newWays)))
 print ("Ways with modified properties: " + str(len(modifiedWays)))
