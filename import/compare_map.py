@@ -114,6 +114,8 @@ modifiedWays = []
 createXML = ""
 modifyXML = ""
 manualCheck = []
+bufferInMeter = 5
+buffer = (bufferInMeter / (60 * 1852))
 
 # Time to starte analyse
 for Oway in wayList:
@@ -221,10 +223,10 @@ for Oway in wayList:
             myNodes.append( ( wayNode[0], wayNode[1] ) )
         thisSWay = LineString(myNodes)
         # compare the two ways
-        if thisOWay.within(thisSWay.buffer(0.000089)):
+        if thisOWay.within(thisSWay.buffer(buffer)):
             #print ("O", end=''),
             waysAreEqual = 1
-#        if thisSWay.within(thisOWay.buffer(0.000089)):
+#        if thisSWay.within(thisOWay.buffer(buffer)):
 #            print ("S", end=''),
         if thisOWay.almost_equals(thisSWay, 5):
             #print ("5", end=''),
@@ -299,6 +301,8 @@ for Oway in wayList:
             if (Obridge != None): Oway['tags']['bridge'] = Obridge
             if (Ojunction != None): Oway['tags']['junction'] = Ojunction
             if (Osurface != None): Oway['tags']['surface'] = Osurface
+            if (Oname == None):
+                if (Ononame == None): Ononame = "yes"
             if (Ononame != None): Oway['tags']['noname'] = Ononame
             if Oway not in modifiedWays:
                 modifiedWays.append(Oway)
