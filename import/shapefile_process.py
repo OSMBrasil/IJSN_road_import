@@ -57,6 +57,18 @@ while feature:
     if (name == None):
         feature.SetField("noname", "yes")
     if (name != None):
+        name = name.replace("N.S.", "Nossa Senhora")
+        name = name.replace("N.s.", "Nossa Senhora")
+        name = name.replace("Ns ", "Nossa Senhora ")
+        name = name.replace("Eng.", "Engineiro")
+        name = name.replace("Pres.", "Presidente")
+        name = name.replace("Dr.", "Doutor")
+        name = name.replace("Cel.", "Coronel")
+        name = name.replace("Cap.", "Capitão")
+        name = name.replace("Prof.", "Professor")
+        name = name.replace("Ver.", "Vereador")
+        name = name.replace("Mal.", "Marechal")
+        name = name.replace("Gov.", "Governador")
         name = name.replace("R.", "Rua")
         name = name.replace("Av.", "Avenida")
         name = name.replace("Ac.", "Acesso")
