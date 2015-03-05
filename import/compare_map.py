@@ -18,7 +18,7 @@
 import sys
 import ogr
 import json
-from shapely.geometry import shape, mapping, LineString
+from shapely.geometry import shape, mapping, LineString, MultiLineString, Point
 
 if len(sys.argv) < 3:
     print("Usage: python compare_map.py shapefile jsonfile")
@@ -49,8 +49,7 @@ for element in jsonFull['elements']:
         if (version != None): wayList.append(element)
     if (element['type'] == "node" ):
         if (version != None): nodeList.append('{"type": "Point", "coordinates": [ '+ str(element['lon']) + ', ' + str(element['lat']) + '], "id": '+str(element['id']) + ' }')
-tmp = '{"nodes": [' + ','.join(nodeList)+'] }'
-nodeJSON = json.loads(tmp)
+nodeJSON = json.loads('{"nodes": [' + ','.join(nodeList)+'] }')
 
 print(" Ways: " + str(len(wayList)) )
 print("Nodes: " +str(len(nodeList)))
@@ -263,6 +262,9 @@ for Oway in wayList:
                     Oref = Sref
                     iChanged = 1
                 elif (Oref != Sref): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "ref='+str(Oref)+' not equal ' +str(Sref)+'"}'))
+            if (Ohighway == "road"):
+                Ohighway = Shighway
+                iChanged = 1
             if (Ohighway != Shighway): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "highway='+str(Ohighway)+' not equal ' +str(Shighway)+'"}'))
             if (Osurface == None):
                 if (Ssurface != None):
@@ -309,10 +311,71 @@ for Oway in wayList:
             iChanged = 0
             break
 
+oldWay = MultiLineString(OverpassWays).buffer(buffer)
+for Sway in shapeFull['features']:
+    myNodes = []
+    for wayNode in Sway['geometry']['coordinates']:
+        myNodes.append( ( wayNode[0], wayNode[1] ) )
+    thisSWay = LineString(myNodes)
+    myNodes = []
+    if (thisSWay.intersects(oldWay) == False):
+        #print (Sway)
+        for i in Sway['geometry']['coordinates']:
+            #print (i)
+            proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer / 2 )
+            nodeID = None
+            while nodeID is None:
+                for j in nodeJSON['nodes']:
+                    # print (j)
+                    if (Point( ( float(j['coordinates'][0]), float(j['coordinates'][1]) ) ).within(proximity)):
+                        nodeID = j['id']
+                nodeID = ( (len(newNodes) + 1) * -1)
+            if (nodeID < 0):
+                newNodes.append( {"id": nodeID, "lat": i[1], "lon": i[0], "tags": { "source": "IJSN" } } )
+                nodeJSON['nodes'].append( {"type": "Point", "coordinates": [ i[0], i[1] ], "id": nodeID, } )
+            myNodes.append(nodeID)
+        #print (myNodes)
+        #print (Sway)
+        #'properties': {'municipio': 'AtílioVivácqua', 'junction': None, 'surface': 'paved', 'bridge': None, 'noname': None, 'lanes': '2', 'name': 'Avenida N.s. Aparecida', 'highway': 'tertiary', 'layer': None, 'alt_name': None, 'ref': None}
+        tags = []
+        newWayID = ( (len(newWays) + 64001) * -1)
+        if (Sway['properties']['highway'] != None): tags.append(["highway", Sway['properties']['highway']])
+        if (Sway['properties']['surface'] != None): tags.append(["surface", Sway['properties']['surface']])
+        if (Sway['properties']['name'] != None): tags.append(["name", Sway['properties']['name']])
+        if (Sway['properties']['alt_name'] != None): tags.append(["alt_name", Sway['properties']['alt_name']])
+        if (Sway['properties']['ref'] != None): tags.append(["ref", Sway['properties']['ref']])
+        if (Sway['properties']['noname'] != None): tags.append(["noname", Sway['properties']['noname']])
+        if (Sway['properties']['layer'] != None): tags.append(["layer", Sway['properties']['layer']])
+        if (Sway['properties']['lanes'] != None): tags.append(["lanes", Sway['properties']['lanes']])
+        if (Sway['properties']['bridge'] != None): tags.append(["bridge", Sway['properties']['bridge']])
+        if (Sway['properties']['junction'] != None): tags.append(["junction", Sway['properties']['junction']])
+        tags.append(["source", "IJSN"])
+        newWays.append( {"id": newWayID, "nodes": myNodes, "tags": tags } )
+        #print (newWays)
 
-print ("New ways created: " + str(len(newWays)))
+
+print ("New ways created: " + str(len(newWays))) #+ " /with " + str(len(newNodes)) + " new nodes"
 print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
+
+for i in newNodes:
+    #i['tags']['source'] = "IJSN"
+    #print (i)
+    createXML = createXML + '    <node id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" lat="'+str(i['lat'])+'" lon="'+str(i['lon'])+'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
+    for j in i['tags']:
+        #print (j)
+        createXML = createXML + '      <tag k="'+j+'" v="'+i['tags'][j]+'" />\n'
+    #createXML = createXML + '      <tag k="source" v="IJSN" />\n'
+    createXML = createXML + '    </node>'
+
+for i in newWays:
+    createXML = createXML + '    <way id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
+    for j in i['nodes']:
+        createXML = createXML + '      <nd ref="'+str(j)+'" />\n'
+    for k in i['tags']:
+        print (k)
+        createXML = createXML + '      <tag k="'+k[0]+'" v="'+k[1]+'" />\n'
+    createXML = createXML + '    </way>\n'
 
 for i in modifiedWays:
     modifyXML = modifyXML + '    <way id="'+str(i['id'])+'" timestamp="'+i['timestamp']+'" changeset="'+str(i['changeset'])+'" version="'+str(i['version'])+'" visible="true" uid="'+str(i['uid'])+'" user="'+i['user']+'" >\n'
