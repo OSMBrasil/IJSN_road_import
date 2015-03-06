@@ -320,19 +320,24 @@ for Sway in shapeFull['features']:
     myNodes = []
     if (thisSWay.intersects(oldWay) == False):
         for i in Sway['geometry']['coordinates']:
-            proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer / 2 )
+            proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer )
             nodeID = None
             while nodeID is None:
+                for j in newNodes:
+                    if (Point( (j['lon'], j['lat'])).within(proximity)):
+                        nodeID = j['id']
                 for j in nodeJSON['nodes']:
                     if (Point( ( float(j['coordinates'][0]), float(j['coordinates'][1]) ) ).within(proximity)):
                         nodeID = j['id']
-                nodeID = ( (len(newNodes) + 1) * -1)
+                if (nodeID == None):
+                    nodeID = ( (len(newNodes) + len(newWays) + 1) * -1)
             if (nodeID < 0):
-                newNodes.append( {"id": nodeID, "lat": i[1], "lon": i[0], "tags": { "source": "IJSN" } } )
-                nodeJSON['nodes'].append( {"type": "Point", "coordinates": [ i[0], i[1] ], "id": nodeID, } )
+                tmp =  {"id": nodeID, "lat": i[1], "lon": i[0], "tags": { "source": "IJSN" } }
+                if tmp not in newNodes:
+                    newNodes.append( tmp )
             myNodes.append(nodeID)
         tags = []
-        newWayID = ( (len(newWays) + 64001) * -1)
+        newWayID = ( (len(newNodes) + len(newWays) + 1) * -1)
         if (Sway['properties']['highway'] != None): tags.append(["highway", Sway['properties']['highway']])
         if (Sway['properties']['surface'] != None): tags.append(["surface", Sway['properties']['surface']])
         if (Sway['properties']['name'] != None): tags.append(["name", Sway['properties']['name']])
@@ -346,8 +351,7 @@ for Sway in shapeFull['features']:
         tags.append(["source", "IJSN"])
         newWays.append( {"id": newWayID, "nodes": myNodes, "tags": tags } )
 
-
-print ("New ways created: " + str(len(newWays))) #+ " /with " + str(len(newNodes)) + " new nodes"
+print ("New ways created: " + str(len(newWays)) + " with " + str(len(newNodes)) + " new nodes")
 print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
 
@@ -355,7 +359,7 @@ for i in newNodes:
     createXML = createXML + '    <node id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" lat="'+str(i['lat'])+'" lon="'+str(i['lon'])+'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
     for j in i['tags']:
         createXML = createXML + '      <tag k="'+j+'" v="'+i['tags'][j]+'" />\n'
-    createXML = createXML + '    </node>'
+    createXML = createXML + '    </node>\n'
 
 for i in newWays:
     createXML = createXML + '    <way id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
