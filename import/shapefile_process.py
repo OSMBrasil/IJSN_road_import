@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+# -*- coding: utf-8 -*-
 
 # Copyright (C) 2015 Aun Johnsen <skippern@gimnechiske.org>
 #
@@ -60,7 +61,7 @@ while feature:
         name = name.replace("N.S.", "Nossa Senhora")
         name = name.replace("N.s.", "Nossa Senhora")
         name = name.replace("Ns ", "Nossa Senhora ")
-        name = name.replace("Eng.", "Engineiro")
+        name = name.replace("Eng.", "Engenheiro")
         name = name.replace("Pres.", "Presidente")
         name = name.replace("Dr.", "Doutor")
         name = name.replace("Cel.", "Coronel")
@@ -222,7 +223,7 @@ while feature:
         name = name.replace("Faz ", "Fazenda ")
         name = name.replace("Com ", "Comunidade ")
         name = name.replace("Comun.", "Comunidade")
-        name = name.replace("Laborat.", "Laboratorio")
+        name = name.replace("Laborat.", "Laboratório")
         name = name.replace("S.", "São")
         feature.SetField("name", name)
     if (altName != None):
@@ -232,7 +233,7 @@ while feature:
         altName = altName.replace("Faz ", "Fazenda ")
         altName = altName.replace("Com ", "Comunidade ")
         altName = altName.replace("Comun.", "Comunidade")
-        altName = altName.replace("Laborat.", "Laboratorio")
+        altName = altName.replace("Laborat.", "Laboratório")
         altName = altName.replace("S.", "São")
         if (name == None):
             feature.SetField("name", altName)
