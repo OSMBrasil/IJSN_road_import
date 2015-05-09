@@ -31,7 +31,7 @@ The following values: `Acesso`, `Alameda`, `Avenida`, `Beco`, `Caminho`, `Ciclov
 
 `Rotatória` should be tagged `junction=roundabout` and form a closed circle
 
-`Caminho` and `Trilha` should be tagged `highway=track` + `tracktype=1`
+`Caminho` and `Trilha` should be tagged `highway=track` + `tracktype=grade1`
 
 `Ciclovia` should be tagged `highway=cycleway`
 
