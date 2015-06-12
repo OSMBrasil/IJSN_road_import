@@ -103,7 +103,7 @@ for way in shapeFull['features']:
         ShapeUnnamedWay = ShapeUnnamedWay + (thisWay.length * 60 * 1852)
     ShapeWays.append(thisWay)
 
-print("Total length of ways in JSON file: " + ('%.3f' % (JSONwayLength / 1000)) + "km (avg way lenght: " + ('%.2f' % (JSONwayLength / len(wayList))) + "m / node distane: " + ('%.2f' % (JSONwayLength / len(nodeList))) + "m)")
+print("Total length of ways in JSON file: " + ('%.3f' % (JSONwayLength / 1000)) + "km (avg way lenght: " + ('%.2f' % (JSONwayLength / len(wayList))) + "m / node distance: " + ('%.2f' % (JSONwayLength / len(nodeList))) + "m)")
 print("Named way: " + ('%.3f' % (namedWayLength / 1000)) + "km, unnamed: " + ('%.3f' % (unNamedWayLength / 1000)) + "km")
 print("Total length of ways in Shapefile: " + ('%.3f' % (ShapeWayLength / 1000)) + "km (" + str(len(ShapeWays)) + " ways)")
 print("Named way: " + ('%.3f' % (ShapeNamedWay / 1000)) + "km, unnamed: " + ('%.3f' % (ShapeUnnamedWay / 1000)) + "km")
