@@ -292,7 +292,7 @@ for Oway in wayList:
             if (Slayer != None):
                 if (Olayer == None):
                     Olayer = Slayer
-                    iChanged
+                    iChanged = 1
         waysAreEqual = 0
         if (iChanged == 1):
             if (Oname != None): Oway['tags']['name'] = Oname
