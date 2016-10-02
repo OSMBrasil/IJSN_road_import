@@ -41,7 +41,19 @@ data=open(shapefile)
 shapeFull = json.load(data)
 data.close()
 
-for element in jsonFull['elements']:
+#jsonFull = json.loads(jsonFull)
+#jsonFull = json.dumps(jsonFull)
+jsonFull = json.loads(jsonFull)
+#shapeFull = json.loads(shapeFull)
+# Go through downloaded data and build wayList and nodeList
+#print(jsonFull)
+#print("0="+jsonFull[0])
+#print("0z="+json.loads(jsonFull[0]))
+#print("element="+jsonFull['elements'])
+#print(jsonFull.keys())
+#print("elementz="+json.loads(jsonFull)[0]['elements'])
+#for element in jsonFull['elements']:
+for element in jsonFull.get("elements"):
     try:
         version = element['version']
     except:

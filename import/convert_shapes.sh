@@ -21,7 +21,7 @@
 unzip -o ../shp/Arruamento.zip -d ../shp/streets
 unzip -o ../shp/Trecho_Rodoviario.zip -d ../shp/highways
 
-./shapefile_process.py
+python3.5 shapefile_process.py
 
 # convert to WGS84, selecting fields and streets with name value
 ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \

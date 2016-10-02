@@ -26,6 +26,8 @@ file = "../shp/streets/Arruamento.shp"
 
 dataSource = driver.Open(file, 1)
 
+print("Building new fields")
+
 layer = dataSource.GetLayer()
 layerdef = layer.GetLayerDefn()
 new_field = ogr.FieldDefn("name", ogr.OFTString)
@@ -49,6 +51,8 @@ layer.CreateField(new_field)
 new_field = ogr.FieldDefn("noname", ogr.OFTString)
 layer.CreateField(new_field)
 feature = layer.GetNextFeature()
+
+print("Setting variables")
 
 while feature:
     name = feature.GetField("nome")
@@ -248,6 +252,10 @@ while feature:
         feature.SetField("surface", "unpaved")
     if (feature.GetField("situacFisi") == "Planejada"): feature.SetField("highway", "proposed")
     if (feature.GetField("situacFisi") == "Em Construção"): feature.SetField("highway", "construction")
+    municipio = feature.GetField("municipio")
+    if (municipio != None):
+        municipio = municipio.replace(' ', '')
+        feature.SetField("municipio", municipio)
     layer.SetFeature(feature)
     feature = layer.GetNextFeature()
 

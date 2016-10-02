@@ -37,11 +37,11 @@ for i in "Afonso Cláudio" "Alegre" "Alfredo Chaves" "Alto Rio Novo" "Anchieta" 
     date
     k=`echo $i|sed 's/ //g'`
     ogr2ogr -overwrite -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' -where "municipio like \"$k\"" ../shp/shape/$k.shp  ../shp/Total_highways.shp Total_highways
-    rm "../shp/json/$i.json" 2>/dev/null
+    mv "../shp/json/$i.json" "../shp/json/$i.json~" 2>/dev/null
     ogr2ogr -overwrite -f "GeoJSON" "../shp/json/$i.json" "../shp/shape/$k.shp" "$k" 2>/dev/null
-    rm "../shp/osm/$i.json" 2>/dev/null
-    python3 download_area.py "$i"
-    rm "../shp/flare/$k.json" 2>/dev/null
-    rm "../shp/osmC/$k.xml" 2>/dev/null
-    python3 compare_map.py "../shp/json/$i.json" "../shp/osm/$i.json"
+    mv "../shp/osm/$i.json" "../shp/osm/$i.json~" 2>/dev/null
+    python3.5 download_area.py "$i"
+    mv "../shp/flare/$k.json" "../shp/osm/$k.json~" 2>/dev/null
+    mv "../shp/osmC/$k.xml" "../shp/osmC/$k.xml~" 2>/dev/null
+    python3.5 compare_map.py "../shp/json/$i.json" "../shp/osm/$i.json"
 done
