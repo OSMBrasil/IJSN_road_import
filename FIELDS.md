@@ -62,7 +62,7 @@ Physical situation, `NULL` or `Projetada`. If value is `Projetada`, than tag as 
 nrFaixas
 =======
 
-Integer value between 1 and 6 for number of `lanes`, be ware that it seems like it counts lanes in both directions on duplicated roads, even when being marked with separate tracks.
+Integer value between 1 and 6 for number of `lanes`, be aware that it seems like it counts lanes in both directions on duplicated roads, even when being marked with separate tracks.
 
 trafego
 =======
@@ -107,7 +107,7 @@ Two values, `NULL` and `Restituição` - ignore
 fonte
 ======
 
-`CGEO/IJSN`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`.
+`CGEO/IJSN`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`. All ways with altered name should have tag `source:name=IJSN`. 
 
 Trecho_Rodoviario_ES.shp
 =======
@@ -230,4 +230,4 @@ Source date, all is `03/08/2012`, already traced data from `DER-ES` is of newer 
 fonte
 =====
 
-`IJSN/DER-ES`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`.
+`IJSN/DER-ES`, all ways created by this import should have `source=IJSN`, for ways edited I suggest we dont change the `source` tag. All changesets should have the tag `source=IJSN`. All ways with altered name should have tag `source:name=IJSN`.
