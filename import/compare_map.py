@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015 Aun Johnsen <skippern@gimnechiske.org>
@@ -27,32 +27,37 @@ if len(sys.argv) < 3:
 else:
     shapefile = sys.argv[1] # ogr2ogr sort for one municipality only
     jsonfile = sys.argv[2] # result of download_area.py (one municipality)
+#    shapefile = unicode(sys.argv[1].encode('utf-8')) # ogr2ogr sort for one municipality only
+#    jsonfile = unicode(sys.argv[2].encode('utf-8')) # result of download_area.py (one municipality)
 
 # Global variables we will need
+
+print shapefile, jsonfile
 
 nodeList = []
 wayList = []
 
-data=open(jsonfile)
-jsonFull = json.load(data)
-data.close()
+try:
+    data=open(jsonfile)
+    jsonFull = json.load(data)
+    data.close()
+except:
+    print "ERROR: JSON file not valid"
+    sys.exit(1)
 
-data=open(shapefile)
-shapeFull = json.load(data)
-data.close()
+try:
+    data=open(shapefile)
+    shapeFull = json.load(data)
+    data.close()
+except:
+    print "ERROR: shapefile not valid"
+    sys.exit(1)
 
-#jsonFull = json.loads(jsonFull)
-#jsonFull = json.dumps(jsonFull)
-jsonFull = json.loads(jsonFull)
-#shapeFull = json.loads(shapeFull)
-# Go through downloaded data and build wayList and nodeList
-#print(jsonFull)
-#print("0="+jsonFull[0])
-#print("0z="+json.loads(jsonFull[0]))
-#print("element="+jsonFull['elements'])
-#print(jsonFull.keys())
-#print("elementz="+json.loads(jsonFull)[0]['elements'])
-#for element in jsonFull['elements']:
+try:
+    jsonFull = json.loads(jsonFull)
+except:
+    pass
+
 for element in jsonFull.get("elements"):
     try:
         version = element['version']

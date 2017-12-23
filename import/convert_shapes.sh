@@ -21,8 +21,8 @@
 unzip -o ../shp/Arruamento.zip -d ../shp/streets
 unzip -o ../shp/Trecho_Rodoviario.zip -d ../shp/highways
 
-python3.5 shapefile_process.py
-
+./shapefile_process.py
+exit 0
 # convert to WGS84, selecting fields and streets with name value
 ogr2ogr -select 'name, alt_name, ref, surface, lanes, municipio, highway, layer, bridge, junction, noname' \
     -a_srs EPSG:4326 -t_srs EPSG:4326 \

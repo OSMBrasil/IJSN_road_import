@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#! /usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright (C) 2015 Aun Johnsen <skippern@gimnechiske.org>
@@ -96,6 +96,7 @@ while feature:
         name = name.replace("Pte.", "Ponte")
         name = name.replace("Rot.", "Rotatória")
         name = name.replace("Trv.", "Trevo")
+        name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
         feature.SetField("name", name)
     surface = feature.GetField("revestimen")
     if (surface == "Pavimentada"):
