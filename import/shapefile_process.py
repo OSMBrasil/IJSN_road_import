@@ -59,22 +59,32 @@ while feature:
     if (name != None):
         if (name.find(" Projetada") > 0):
             name = None
+        elif (name.find("Rua Sem Nome") > 0):
+            name = None
+        elif (name.find("Rua Sn") > 0):
+            name = None
     if (name == None):
         feature.SetField("noname", "yes")
     if (name != None):
+        name = name.replace("\/", "/")
+        name = name.replace("N. S.", "Nossa Senhora")
         name = name.replace("N.S.", "Nossa Senhora")
         name = name.replace("N.s.", "Nossa Senhora")
         name = name.replace("Ns ", "Nossa Senhora ")
+        name = name.replace("N. Senhora", "Nossa Senhora")
         name = name.replace("Eng.", "Engenheiro")
         name = name.replace("Pres.", "Presidente")
         name = name.replace("Dr.", "Doutor")
         name = name.replace("Cel.", "Coronel")
         name = name.replace("Cap.", "Capitão")
         name = name.replace("Prof.", "Professor")
+        name = name.replace("Profª", "Professora")
         name = name.replace("Ver.", "Vereador")
         name = name.replace("Mal.", "Marechal")
         name = name.replace("Gov.", "Governador")
+        name = name.replace("Dep.", "Deputado")
         name = name.replace("R.", "Rua")
+        name = name.replace("R .", "Rua ")
         name = name.replace("Av.", "Avenida")
         name = name.replace("Ac.", "Acesso")
         name = name.replace("Rod.", "Rodovia")
@@ -84,11 +94,14 @@ while feature:
         name = name.replace("Est.", "Estrada")
         name = name.replace("Estr.", "Estrada")
         name = name.replace("Pç.", "Praça")
+        name = name.replace("Pc.", "Praça")
+        name = name.replace("Pe.", "Padre")
         name = name.replace("Rmp.", "Rampa")
         name = name.replace("Tr.", "Travessa")
         name = name.replace("Tv.", "Travessa")
         name = name.replace("Srv.", "Servidão")
         name = name.replace("Vdo.", "Viaduto")
+        name = name.replace("B.", "Beco")
         name = name.replace("Bc.", "Beco")
         name = name.replace("Ld.", "Ladeira")
         name = name.replace("Lad.", "Ladeira")
@@ -96,7 +109,14 @@ while feature:
         name = name.replace("Pte.", "Ponte")
         name = name.replace("Rot.", "Rotatória")
         name = name.replace("Trv.", "Trevo")
+        name = name.replace("Psg.", "Passagem")
+        name = name.replace("RuaEstrada", "Estrada")
         name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
+        name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
+        name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
+        name = name.replace("Rod  do Sol", "Rodovia do Sol")
+        name = name.replace(" Ii", " II").replace(" IIi", " III").replace(" Iv", " IV").replace(" Ix", " IX")
+        name = name.replaxe("Givernador", "Governador")
         feature.SetField("name", name)
     surface = feature.GetField("revestimen")
     if (surface == "Pavimentada"):
@@ -223,6 +243,7 @@ while feature:
         else: altName = junkCombined
     if (name != None):
         name = name.replace("Rod.", "Rodovia")
+        name = name.replace("Pc.", "Praça")
         name = name.replace("Faz.", "Fazenda")
         name = name.replace("Estr.", "Estrada")
         name = name.replace("Faz ", "Fazenda ")
@@ -233,6 +254,7 @@ while feature:
         feature.SetField("name", name)
     if (altName != None):
         altName = altName.replace("Rod.", "Rodovia")
+        altName = altName.replace("Pc.", "Praça")
         altName = altName.replace("Faz.", "Fazenda")
         altName = altName.replace("Estr.", "Estrada")
         altName = altName.replace("Faz ", "Fazenda ")

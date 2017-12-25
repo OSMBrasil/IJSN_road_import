@@ -374,37 +374,40 @@ print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
 
 for i in newNodes:
-    createXML = createXML + '    <node id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" lat="'+str(i['lat'])+'" lon="'+str(i['lon'])+'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
+    createXML = createXML + u'    <node id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" lat="'+unicode(i['lat'])+u'" lon="'+unicode(i['lon'])+u'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
     for j in i['tags']:
-        createXML = createXML + '      <tag k="'+j+'" v="'+i['tags'][j]+'" />\n'
-    createXML = createXML + '    </node>\n'
+        createXML = createXML + u'      <tag k="'+unicode(j)+u'" v="'+unicode(i['tags'][j])+u'" />\n'
+    createXML = createXML + u'    </node>\n'
 
 for i in newWays:
-    createXML = createXML + '    <way id="'+str(i['id'])+'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
+    createXML = createXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
     for j in i['nodes']:
-        createXML = createXML + '      <nd ref="'+str(j)+'" />\n'
+        createXML = createXML + u'      <nd ref="'+unicode(j)+u'" />\n'
     for k in i['tags']:
-        createXML = createXML + '      <tag k="'+k[0]+'" v="'+k[1]+'" />\n'
-    createXML = createXML + '    </way>\n'
+        createXML = createXML + u'      <tag k="'+unicode(k[0])+u'" v="'+unicode(k[1])+u'" />\n'
+    createXML = createXML + u'    </way>\n'
 
 for i in modifiedWays:
-    modifyXML = modifyXML + '    <way id="'+str(i['id'])+'" timestamp="'+i['timestamp']+'" changeset="'+str(i['changeset'])+'" version="'+str(i['version'])+'" visible="true" uid="'+str(i['uid'])+'" user="'+i['user']+'" >\n'
+    modifyXML = modifyXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="'+i['timestamp']+u'" changeset="'+unicode(i['changeset'])+u'" version="'+unicode(i['version'])+u'" visible="true" uid="'+unicode(i['uid'])+u'" user="'+unicode(i['user'])+u'" >\n'
     for j in i['nodes']:
-        modifyXML = modifyXML + '      <nd ref="'+str(j)+'" />\n'
+        modifyXML = modifyXML + u'      <nd ref="'+unicode(j)+u'" />\n'
     for k in i['tags']:
-        modifyXML = modifyXML + '      <tag k="'+k+'" v="'+i['tags'][k]+'" />\n'
-    modifyXML = modifyXML + '    </way>\n'
+        modifyXML = modifyXML + u'      <tag k="'+unicode(k)+u'" v="'+unicode(i['tags'][k])+u'" />\n'
+    modifyXML = modifyXML + u'    </way>\n'
 
-osmChange = '<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + createXML + '  </create>\n  <modify>\n' + modifyXML + '  </modify>\n</osmChange>'
+#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
+osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create> </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
 
 area = shapeFull['features'][0]['properties']['municipio']
 
+#print osmChange
+
 filename = "../shp/osmC/"+area+".osc"
-f = open(filename, 'w')
-f.write(osmChange)
+f = open(filename, 'wb')
+f.write(osmChange.encode('utf8'))
 f.close()
 
 filename = "../shp/flare/"+area+".json"
-f = open(filename, 'w')
+f = open(filename, 'wb')
 f.write(json.dumps( manualCheck ))
 f.close()
