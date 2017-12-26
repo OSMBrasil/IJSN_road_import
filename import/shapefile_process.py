@@ -116,7 +116,7 @@ while feature:
         name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
         name = name.replace("Rod  do Sol", "Rodovia do Sol")
         name = name.replace(" Ii", " II").replace(" IIi", " III").replace(" Iv", " IV").replace(" Ix", " IX")
-        name = name.replaxe("Givernador", "Governador")
+        name = name.replace("Givernador", "Governador")
         feature.SetField("name", name)
     surface = feature.GetField("revestimen")
     if (surface == "Pavimentada"):

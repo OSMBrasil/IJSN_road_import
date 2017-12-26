@@ -32,7 +32,7 @@ else:
 
 # Global variables we will need
 
-print shapefile, jsonfile
+#print shapefile, jsonfile
 
 nodeList = []
 wayList = []

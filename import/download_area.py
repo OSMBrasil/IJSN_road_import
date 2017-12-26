@@ -45,6 +45,7 @@ cityID = int(cityID) + 3600000000
 
 api = overpass.API(timeout=600)
 print("Downloading data.")
+#searchString = 'way["highway"](area:'+str(cityID)+');(._;>;);out meta;'
 searchString = 'way["highway"]["name"](area:'+str(cityID)+');(._;>;);out meta;'
 #searchString = 'way["highway"][!"name"](area:'+str(cityID)+');(._;>;);out meta;'
 highways = api.Get(searchString, responseformat="json")
@@ -54,4 +55,4 @@ filename = u"../shp/osm/"+area+u".json"
 f = open(filename, 'w')
 f.write(json.dumps(highways))
 f.close()
-print(filename + " saved")
+#print(filename + " saved")
