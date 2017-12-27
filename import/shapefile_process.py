@@ -17,6 +17,7 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 import ogr
+import re
 
 __version__ = "$Revision: 1 $"
 
@@ -75,6 +76,7 @@ while feature:
         name = name.replace("Eng.", "Engenheiro")
         name = name.replace("Pres.", "Presidente")
         name = name.replace("Dr.", "Doutor")
+        name = name.replace("Drª", "Doutora")
         name = name.replace("Cel.", "Coronel")
         name = name.replace("Cap.", "Capitão")
         name = name.replace("Prof.", "Professor")
@@ -83,7 +85,7 @@ while feature:
         name = name.replace("Mal.", "Marechal")
         name = name.replace("Gov.", "Governador")
         name = name.replace("Dep.", "Deputado")
-        name = name.replace("R.", "Rua")
+        name = re.sub("^R.", "Rua", name)
         name = name.replace("R .", "Rua ")
         name = name.replace("Av.", "Avenida")
         name = name.replace("Ac.", "Acesso")
@@ -101,7 +103,7 @@ while feature:
         name = name.replace("Tv.", "Travessa")
         name = name.replace("Srv.", "Servidão")
         name = name.replace("Vdo.", "Viaduto")
-        name = name.replace("B.", "Beco")
+        name = re.sub("^B.", "Beco", name)
         name = name.replace("Bc.", "Beco")
         name = name.replace("Ld.", "Ladeira")
         name = name.replace("Lad.", "Ladeira")
