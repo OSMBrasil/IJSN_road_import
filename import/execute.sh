@@ -40,10 +40,10 @@ for i in "Afonso Cláudio" "Alegre" "Alfredo Chaves" "Alto Rio Novo" "Anchieta" 
     mv "../shp/json/$i.json" "../shp/json/$i.json~" 2>/dev/null
     ogr2ogr -overwrite -f "GeoJSON" "../shp/json/$i.json" "../shp/shape/$k.shp" "$k"
 #    ogr2ogr -overwrite -f "GeoJSON" "../shp/json/$i.json" "../shp/shape/$k.shp" "$k" 2>/dev/null
-    mv "../shp/osm/$i.json" "../shp/osm/$i.json~" 2>/dev/null
+    cp "../shp/osm/$i.json" "../shp/osm/$i.json~" 2>/dev/null
     ./download_area.py "$i"
-    mv "../shp/flare/$k.json" "../shp/osm/$k.json~" 2>/dev/null
-    mv "../shp/osmC/$k.xml" "../shp/osmC/$k.xml~" 2>/dev/null
-    mv "../shp/osmC/$k.osc" "../shp/osmC/$k.osc~" 2>/dev/null
+    cp "../shp/flare/$k.json" "../shp/osm/$k.json~" 2>/dev/null
+    cp "../shp/osmC/$k.xml" "../shp/osmC/$k.xml~" 2>/dev/null
+    cp "../shp/osmC/$k.osc" "../shp/osmC/$k.osc~" 2>/dev/null
     ./compare_map.py "../shp/json/$i.json" "../shp/osm/$i.json"
 done
