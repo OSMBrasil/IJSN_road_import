@@ -19,7 +19,9 @@
 # Dependency: overpass-api-python-wrapper: see https://github.com/mvexel/overpass-api-python-wrapper
 import overpass
 import sys
+import time
 import json
+from jsonmerge import merge
 
 api = overpass.API()
 #api = overpass.API(responseformat="json")
@@ -38,21 +40,77 @@ print u"You have entered: ", area
 
 # Building overpass query
 searchString = u'relation["boundary"="administrative"]["admin_level"="8"]["name"~"'+unicode(area).encode('ascii', 'replace').replace("?", ".")+u'"](-21.5,-42.0,-17.5,-39.0);out ids;'
-city = api.Get(searchString, responseformat="json")
-cityID = city['elements'][0]['id']
-print("Relation ID for " + area + ": " + str(cityID))
-cityID = int(cityID) + 3600000000
+city = None
+while city is None:
+    try:
+        city = api.Get(searchString, responseformat="json")
+        cityID = city['elements'][0]['id']
+        print("Relation ID for " + area + ": " + str(cityID))
+        cityID = int(cityID) + 3600000000
+    except:
+        city = None
+        time.sleep(60)
 
+#highwayList = [ "road", "motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secundary", "secundary_link", "tertiary", "tertiary_link", "unclassified", "residential", "service", "track", "path", "footway", "cycleway", "steps" ]
+#highwayList = [ "road", "trunk", "trunk_link", "primary", "primary_link", "secundary", "tertiary", "unclassified", "residential", "service", "track" ]
+highwayList = [ "road", "trunk", "primary", "secundary", "tertiary", "unclassified", "residential" ]
+
+#api = overpass.API(timeout=600,maxsize=1073741824)
 api = overpass.API(timeout=600)
-print("Downloading data.")
-#searchString = 'way["highway"](area:'+str(cityID)+');(._;>;);out meta;'
-searchString = 'way["highway"]["name"](area:'+str(cityID)+');(._;>;);out meta;'
-#searchString = 'way["highway"][!"name"](area:'+str(cityID)+');(._;>;);out meta;'
-highways = api.Get(searchString, responseformat="json")
+highways = { "elements": []}
+#highways = {}
+#print "Downloading data: "
+sys.stdout.write("Downloading data: ")
+sys.stdout.flush()
+searchString = 'way["highway"](area:'+str(cityID)+');(._;>;);out meta;'
+try:
+    oldElements = highways["elements"]
+    highways = merge(highways, api.Get(searchString, responseformat="json"))
+    highways["elements"].extend(oldElements)
+    sys.stdout.write("+")
+    sys.stdout.flush()
+except:
+    sys.stdout.write("-")
+    for highway in highwayList:
+        searchString = 'way["highway"="'+highway+'"][!"name"](area:'+str(cityID)+');(._;>;);out meta;'
+        try:
+            try:
+                oldElements = highways["elements"]
+            except:
+                pass
+            highways = merge(highways, api.Get(searchString, responseformat="json"))
+            try:
+                highways["elements"].extend(oldElements)
+            except:
+                pass
+            sys.stdout.write("+")
+            sys.stdout.flush()
+        except:
+            sys.stdout.write("-")
+            sys.stdout.flush()
+            pass
+        searchString = 'way["highway"="'+highway+'"]["name"](area:'+str(cityID)+');(._;>;);out meta;'
+        try:
+            try:
+                oldElements = highways["elements"]
+            except:
+                pass
+            highways = merge(highways, api.Get(searchString, responseformat="json"))
+            try:
+                highways["elements"].extend(oldElements)
+            except:
+                pass
+            sys.stdout.write("+")
+            sys.stdout.flush()
+        except:
+            sys.stdout.write("-")
+            sys.stdout.flush()
+            pass
+print ""
 
-print("Saving data to file")
+print("Saving data to file.")
 filename = u"../shp/osm/"+area+u".json"
 f = open(filename, 'w')
-f.write(json.dumps(highways))
+f.write(json.dumps(highways, indent=3))
 f.close()
-#print(filename + " saved")
+#print(filename + u" saved")

@@ -72,6 +72,11 @@ nodeJSON = json.loads('{"nodes": [' + ','.join(nodeList)+'] }')
 print(" Ways: " + str(len(wayList)) )
 print("Nodes: " +str(len(nodeList)))
 
+
+if len(wayList) is 0:
+    print("No OSM Data available (data file contains 0 ways)")
+    sys.exit(1)
+
 JSONwayLength = 0
 namedWayLength = 0
 unNamedWayLength = 0
@@ -373,29 +378,36 @@ print ("New ways created: " + str(len(newWays)) + " with " + str(len(newNodes)) 
 print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
 
-for i in newNodes:
-    createXML = createXML + u'    <node id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" lat="'+unicode(i['lat'])+u'" lon="'+unicode(i['lon'])+u'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
-    for j in i['tags']:
-        createXML = createXML + u'      <tag k="'+unicode(j)+u'" v="'+unicode(i['tags'][j])+u'" />\n'
-    createXML = createXML + u'    </node>\n'
+if len(newNodes) > 0:
+    for i in newNodes:
+        createXML = createXML + u'    <node id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" lat="'+unicode(i['lat'])+u'" lon="'+unicode(i['lon'])+u'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
+        for j in i['tags']:
+            createXML = createXML + u'      <tag k="'+unicode(j)+u'" v="'+unicode(i['tags'][j])+u'" />\n'
+        createXML = createXML + u'    </node>\n'
 
-for i in newWays:
-    createXML = createXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
-    for j in i['nodes']:
-        createXML = createXML + u'      <nd ref="'+unicode(j)+u'" />\n'
-    for k in i['tags']:
-        createXML = createXML + u'      <tag k="'+unicode(k[0])+u'" v="'+unicode(k[1])+u'" />\n'
-    createXML = createXML + u'    </way>\n'
+if len(newWays) > 0:
+    for i in newWays:
+        createXML = createXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
+        for j in i['nodes']:
+            createXML = createXML + u'      <nd ref="'+unicode(j)+u'" />\n'
+        for k in i['tags']:
+            createXML = createXML + u'      <tag k="'+unicode(k[0])+u'" v="'+unicode(k[1])+u'" />\n'
+        createXML = createXML + u'    </way>\n'
 
-for i in modifiedWays:
-    modifyXML = modifyXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="'+i['timestamp']+u'" changeset="'+unicode(i['changeset'])+u'" version="'+unicode(i['version'])+u'" visible="true" uid="'+unicode(i['uid'])+u'" user="'+unicode(i['user'])+u'" >\n'
-    for j in i['nodes']:
-        modifyXML = modifyXML + u'      <nd ref="'+unicode(j)+u'" />\n'
-    for k in i['tags']:
-        modifyXML = modifyXML + u'      <tag k="'+unicode(k)+u'" v="'+unicode(i['tags'][k])+u'" />\n'
-    modifyXML = modifyXML + u'    </way>\n'
+if len(modifiedWays) > 0:
+    for i in modifiedWays:
+        modifyXML = modifyXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="'+i['timestamp']+u'" changeset="'+unicode(i['changeset'])+u'" version="'+unicode(i['version'])+u'" visible="true" uid="'+unicode(i['uid'])+u'" user="'+unicode(i['user'])+u'" >\n'
+        for j in i['nodes']:
+            modifyXML = modifyXML + u'      <nd ref="'+unicode(j)+u'" />\n'
+        for k in i['tags']:
+            modifyXML = modifyXML + u"      <tag k='"+unicode(k)+u"' v='"+unicode(i['tags'][k])+u"' />\n"
+        modifyXML = modifyXML + u'    </way>\n'
 
+## Create and Modify
 #osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
+## Create only
+#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n  </modify>\n</osmChange>'
+## Modify only
 osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create> </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
 
 area = shapeFull['features'][0]['properties']['municipio']
@@ -409,5 +421,5 @@ f.close()
 
 filename = "../shp/flare/"+area+".json"
 f = open(filename, 'wb')
-f.write(json.dumps( manualCheck ))
+f.write(json.dumps( manualCheck , indent=3))
 f.close()

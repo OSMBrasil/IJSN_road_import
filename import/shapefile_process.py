@@ -113,7 +113,7 @@ while feature:
         name = name.replace("Trv.", "Trevo")
         name = name.replace("Psg.", "Passagem")
         name = name.replace("RuaEstrada", "Estrada")
-        name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
+        name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
         name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
         name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
         name = name.replace("Rod  do Sol", "Rodovia do Sol")
