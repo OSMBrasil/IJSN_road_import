@@ -85,6 +85,7 @@ while feature:
         name = name.replace("Mal.", "Marechal")
         name = name.replace("Gov.", "Governador")
         name = name.replace("Dep.", "Deputado")
+        name = name.replace("Sta.", "Sta ").replace("Sta ", "Santa")
         name = re.sub("^R.", "Rua", name)
         name = name.replace("R .", "Rua ")
         name = name.replace("Av.", "Avenida")
@@ -116,8 +117,8 @@ while feature:
         name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
         name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
         name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
-        name = name.replace("Rod  do Sol", "Rodovia do Sol")
-        name = name.replace(" Ii", " II").replace(" IIi", " III").replace(" Iv", " IV").replace(" Ix", " IX")
+        name = name.replace("Rod do Sol", "Rodovia do Sol")
+        name = name.replace(" Ii", " II").replace(" IIi", " III").replace(" Iv ", " IV ").replace(" Ix ", " IX ").replace(" Vi ", " VI ").replace(" Vii", " VII").replace(" VIIi", " VIII")
         name = name.replace("Givernador", "Governador")
         feature.SetField("name", name)
     surface = feature.GetField("revestimen")
@@ -192,7 +193,8 @@ while feature:
     if (feature.GetField("tipoTrech") == "Caminhos do Campo"): feature.SetField("highway", "track")
     ref = ""
     name = feature.GetField("nome")
-    if (name != None): name = name.replace("BR- ", "BR-")
+    if (name != None): name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
+    if (name != None): name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
     if (name == "Estrada Municipal"): name = None
     if (name != None):
         if (name.find(" Projetada") > 0):
@@ -206,7 +208,8 @@ while feature:
             ref = ref + " " + name
             name = None
     altName = feature.GetField("nomePop")
-    if (altName != None): altName = altName.replace("BR- ", "BR-")
+    if (altName != None): altName = altName.replace("BR -", "BR-").replace("BR- ", "BR-")
+    if (altName != None): altName = altName.replace("ES -", "ES-").replace("ES- ", "ES-")
     if (altName == "Estrada Municipal"): altName = None
     if (altName != None):
         if (len(altName) < 3):
@@ -223,6 +226,7 @@ while feature:
     ref = ref.replace("/", " - ")
     ref = ref.replace(" - ", "-")
     ref = ref.replace("-ES", "- ES")
+    ref = ref.replace("-BR", "- BR")
     myRefs = ref.split()
     ref = ""
     junk = []
@@ -246,6 +250,7 @@ while feature:
     if (name != None):
         name = name.replace("Rod.", "Rodovia")
         name = name.replace("Pc.", "Praça")
+        name = name.replace("Pe.", "Padre")
         name = name.replace("Faz.", "Fazenda")
         name = name.replace("Estr.", "Estrada")
         name = name.replace("Faz ", "Fazenda ")
@@ -257,6 +262,7 @@ while feature:
     if (altName != None):
         altName = altName.replace("Rod.", "Rodovia")
         altName = altName.replace("Pc.", "Praça")
+        altName = altName.replace("Pe.", "Padre")
         altName = altName.replace("Faz.", "Fazenda")
         altName = altName.replace("Estr.", "Estrada")
         altName = altName.replace("Faz ", "Fazenda ")

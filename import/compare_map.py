@@ -37,6 +37,16 @@ else:
 nodeList = []
 wayList = []
 
+def cleanAlt(altName):
+    values = altName.split(";")
+    output = []
+    seen = set()
+    for value in values:
+        if value not in seen:
+            output.append(value)
+            seen.add(value)
+    return ";".join(output)
+
 try:
     data=open(jsonfile)
     jsonFull = json.load(data)
@@ -52,6 +62,8 @@ try:
 except:
     print "ERROR: shapefile not valid"
     sys.exit(1)
+
+# Here we join the LineString elements with same properties into MultiLineStrings, this is to increase positive hits and reduce search time. Would be nice if this could be done by ogr2ogr
 
 try:
     jsonFull = json.loads(jsonFull)
@@ -149,7 +161,7 @@ for Oway in wayList:
     except:
         Oname = None
     try:
-        OaltName = tags['alt_name']
+        OaltName = cleanAlt(tags['alt_name'])
     except:
         OaltName = None
     try:
@@ -205,7 +217,7 @@ for Oway in wayList:
         except:
             Sname = None
         try:
-            SaltName = properties['alt_name']
+            SaltName = cleanAlt(properties['alt_name'])
         except:
             SaltName = None
         try:
@@ -272,14 +284,14 @@ for Oway in wayList:
             if (Sname != Oname):
                 iChanged = 1
                 if (OaltName != None):
-                    if (Oname != None): OaltName = Oname + ";" + OaltName
+                    if (Oname != None): OaltName = cleanAlt(Oname + ";" + OaltName)
                 elif (Oname == Sname): break
                 else: OaltName = Oname
                 Oname = Sname
             if (SaltName != None):
                 iChanged = 1
                 if (OaltName == None): OaltName = SaltName
-                else: OaltName = OaltName + ";" + SaltName
+                else: OaltName = cleanAlt(OaltName + ";" + SaltName)
             if (Sref != None):
                 if (Oref == None):
                     Oref = Sref
@@ -317,17 +329,24 @@ for Oway in wayList:
                     iChanged = 1
         waysAreEqual = 0
         if (iChanged == 1):
-            if (Oname != None): Oway['tags']['name'] = Oname
-            if (OaltName != None): Oway['tags']['alt_name'] = OaltName
+            if (Oname != None): 
+                Oway['tags']['name'] = Oname
+                Ononame = None
+            if (OaltName != None): Oway['tags']['alt_name'] = cleanAlt(OaltName)
             if (Oref != None): Oway['tags']['ref'] = Oref
             if (Ohighway != None): Oway['tags']['highway'] = Ohighway # if this change we have a bug!
-            if (Olanes != None): Oway['tags']['lanes'] = Olanes
+            if (Olanes != None): 
+                Oway['tags']['lanes'] = Olanes
+                if (Olanes == "1"):
+                    Oway['tags']['narrow'] = "yes"
+            if (Obridge != None):
+                Oway['tags']['bridge'] = Obridge
+                if (Olayer == None): Olayer = "1"
             if (Olayer != None): Oway['tags']['layer'] = Olayer
-            if (Obridge != None): Oway['tags']['bridge'] = Obridge
             if (Ojunction != None): Oway['tags']['junction'] = Ojunction
             if (Osurface != None): Oway['tags']['surface'] = Osurface
             if (Oname == None):
-                if (Ononame == None): Ononame = "yes"
+                if (Ononame == None and Oname == None): Ononame = "yes"
             if (Ononame != None): Oway['tags']['noname'] = Ononame
             if Oway not in modifiedWays:
                 modifiedWays.append(Oway)
@@ -341,7 +360,7 @@ for Sway in shapeFull['features']:
         myNodes.append( ( wayNode[0], wayNode[1] ) )
     thisSWay = LineString(myNodes)
     myNodes = []
-    if (thisSWay.intersects(oldWay) == False):
+    if (thisSWay.intersects(oldWay) == False) or (thisSway.within(oldWay) == False):
         for i in Sway['geometry']['coordinates']:
             proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer )
             nodeID = None
@@ -366,10 +385,13 @@ for Sway in shapeFull['features']:
         if (Sway['properties']['name'] != None): tags.append(["name", Sway['properties']['name']])
         if (Sway['properties']['alt_name'] != None): tags.append(["alt_name", Sway['properties']['alt_name']])
         if (Sway['properties']['ref'] != None): tags.append(["ref", Sway['properties']['ref']])
-        if (Sway['properties']['noname'] != None): tags.append(["noname", Sway['properties']['noname']])
+        if (Sway['properties']['noname'] != None): 
+            if (Sway['properties']['name'] == None): tags.append(["noname", Sway['properties']['noname']])
         if (Sway['properties']['layer'] != None): tags.append(["layer", Sway['properties']['layer']])
         if (Sway['properties']['lanes'] != None): tags.append(["lanes", Sway['properties']['lanes']])
+        if (Sway['properties']['lanes'] == "1"): tags.append(["narrow", "yes"])
         if (Sway['properties']['bridge'] != None): tags.append(["bridge", Sway['properties']['bridge']])
+        if (Sway['properties']['layer'] == None): tags.append(["layer", "1"])
         if (Sway['properties']['junction'] != None): tags.append(["junction", Sway['properties']['junction']])
         tags.append(["source", "IJSN"])
         newWays.append( {"id": newWayID, "nodes": myNodes, "tags": tags } )
@@ -377,7 +399,7 @@ for Sway in shapeFull['features']:
 print ("New ways created: " + str(len(newWays)) + " with " + str(len(newNodes)) + " new nodes")
 print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
-
+'''
 if len(newNodes) > 0:
     for i in newNodes:
         createXML = createXML + u'    <node id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" lat="'+unicode(i['lat'])+u'" lon="'+unicode(i['lon'])+u'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
@@ -393,7 +415,7 @@ if len(newWays) > 0:
         for k in i['tags']:
             createXML = createXML + u'      <tag k="'+unicode(k[0])+u'" v="'+unicode(k[1])+u'" />\n'
         createXML = createXML + u'    </way>\n'
-
+'''
 if len(modifiedWays) > 0:
     for i in modifiedWays:
         modifyXML = modifyXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="'+i['timestamp']+u'" changeset="'+unicode(i['changeset'])+u'" version="'+unicode(i['version'])+u'" visible="true" uid="'+unicode(i['uid'])+u'" user="'+unicode(i['user'])+u'" >\n'
@@ -404,11 +426,11 @@ if len(modifiedWays) > 0:
         modifyXML = modifyXML + u'    </way>\n'
 
 ## Create and Modify
-#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
+osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
 ## Create only
 #osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n  </modify>\n</osmChange>'
 ## Modify only
-osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create> </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
+#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create> </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
 
 area = shapeFull['features'][0]['properties']['municipio']
 
