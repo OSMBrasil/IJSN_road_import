@@ -51,9 +51,10 @@ while city is None:
         city = None
         time.sleep(60)
 
-#highwayList = [ "road", "motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secundary", "secundary_link", "tertiary", "tertiary_link", "unclassified", "residential", "service", "track", "path", "footway", "cycleway", "steps" ]
+highwayList = [ "road", "motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secundary", "secundary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street", "service", "pedestrian", "bus_guideway", "escape", "raceway", "track", "path", "footway", "cycleway", "bridleway", "steps", "proposed", "construction" ]
 #highwayList = [ "road", "trunk", "trunk_link", "primary", "primary_link", "secundary", "tertiary", "unclassified", "residential", "service", "track" ]
-highwayList = [ "road", "trunk", "primary", "secundary", "tertiary", "unclassified", "residential" ]
+#highwayList = [ "road", "trunk", "primary", "secundary", "tertiary", "unclassified", "residential" ]
+highwayList = [ "road", "tertiary", "unclassified", "residential" ]
 
 #api = overpass.API(timeout=600,maxsize=1073741824)
 api = overpass.API(timeout=600)
@@ -71,6 +72,7 @@ try:
     sys.stdout.flush()
 except:
     sys.stdout.write("-")
+    sys.stdout.flush()
     for highway in highwayList:
         searchString = 'way["highway"="'+highway+'"][!"name"](area:'+str(cityID)+');(._;>;);out meta;'
         try:

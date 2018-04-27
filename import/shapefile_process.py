@@ -51,6 +51,8 @@ new_field = ogr.FieldDefn("layer", ogr.OFTString)
 layer.CreateField(new_field)
 new_field = ogr.FieldDefn("noname", ogr.OFTString)
 layer.CreateField(new_field)
+new_field = ogr.FieldDefn("ibge_class", ogr.OFTString)
+layer.CreateField(new_field)
 feature = layer.GetNextFeature()
 
 print("Setting variables")
@@ -186,16 +188,22 @@ new_field = ogr.FieldDefn("layer", ogr.OFTString)
 layer.CreateField(new_field)
 new_field = ogr.FieldDefn("noname", ogr.OFTString)
 layer.CreateField(new_field)
+new_field = ogr.FieldDefn("ibge_class", ogr.OFTString)
+layer.CreateField(new_field)
 feature = layer.GetNextFeature()
 
 while feature:
     feature.SetField("highway", "primary")
     if (feature.GetField("tipoTrech") == "Caminhos do Campo"): feature.SetField("highway", "track")
     ref = ""
+    ibge_class = None
     name = feature.GetField("nome")
+    if (name != None): name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
     if (name != None): name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
     if (name != None): name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
-    if (name == "Estrada Municipal"): name = None
+    if (name == "Estrada Municipal"):
+        name = None
+        ibge_class = "municipal"
     if (name != None):
         if (name.find(" Projetada") > 0):
             name = None
@@ -208,9 +216,12 @@ while feature:
             ref = ref + " " + name
             name = None
     altName = feature.GetField("nomePop")
+    if (altName != None): altName = altName.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
     if (altName != None): altName = altName.replace("BR -", "BR-").replace("BR- ", "BR-")
     if (altName != None): altName = altName.replace("ES -", "ES-").replace("ES- ", "ES-")
-    if (altName == "Estrada Municipal"): altName = None
+    if (altName == "Estrada Municipal"): 
+        altName = None
+        ibge_class = "municipal"
     if (altName != None):
         if (len(altName) < 3):
             ref = ref + " " + altName
@@ -223,7 +234,7 @@ while feature:
         if (altName.find("ES-") > -1):
             ref = ref + " " + altName
             altName = None
-    ref = ref.replace("/", " - ")
+    ref = ref.replace("/", " - ").replace("  ", " ").replace("  ", " ")
     ref = ref.replace(" - ", "-")
     ref = ref.replace("-ES", "- ES")
     ref = ref.replace("-BR", "- BR")
@@ -257,6 +268,7 @@ while feature:
         name = name.replace("Com ", "Comunidade ")
         name = name.replace("Comun.", "Comunidade")
         name = name.replace("Laborat.", "Laboratório")
+        name = name.replace("Sta.", "Santa")
         name = name.replace("S.", "São")
         feature.SetField("name", name)
     if (altName != None):
@@ -269,6 +281,7 @@ while feature:
         altName = altName.replace("Com ", "Comunidade ")
         altName = altName.replace("Comun.", "Comunidade")
         altName = altName.replace("Laborat.", "Laboratório")
+        altName = altName.replace("Sta.", "Santa")
         altName = altName.replace("S.", "São")
         if (name == None):
             feature.SetField("name", altName)
@@ -283,6 +296,8 @@ while feature:
         feature.SetField("surface", "unpaved")
     if (feature.GetField("situacFisi") == "Planejada"): feature.SetField("highway", "proposed")
     if (feature.GetField("situacFisi") == "Em Construção"): feature.SetField("highway", "construction")
+    if (ibge_class != None): feature.SetField("ibge_class", ibge_class)
+    else: feature.SetField("ibge_class", None)
     municipio = feature.GetField("municipio")
     if (municipio != None):
         municipio = municipio.replace(' ', '')

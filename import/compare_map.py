@@ -19,6 +19,7 @@
 import sys
 import ogr
 import json
+import re
 from shapely.geometry import shape, mapping, LineString, MultiLineString, Point
 
 if len(sys.argv) < 3:
@@ -36,14 +37,42 @@ else:
 
 nodeList = []
 wayList = []
+addNew = False
 
-def cleanAlt(altName):
+def cleanName(name):
+    name = name.replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ").replace("  ", " ")
+    name = name.replace("Rod.", "Rodovia")
+    name = name.replace("BR -", "BR-").replace("BR- ", "BR-")
+    name = name.replace("ES -", "ES-").replace("ES- ", "ES-")
+    name = name.replace("Pç.", "Praça")
+    name = name.replace("Pc.", "Praça")
+    name = name.replace("Pe.", "Padre")
+    name = name.replace("Faz.", "Fazenda")
+    name = name.replace("Estr.", "Estrada")
+    name = name.replace("Faz ", "Fazenda ")
+    name = name.replace("Com ", "Comunidade ")
+    name = name.replace("Comun.", "Comunidade")
+    name = name.replace("Laborat.", "Laboratório")
+    name = name.replace("Sta.", "Santa")
+    name = name.replace("S.", "São")
+    name = re.sub("^Av.", "Avenida", name)
+    name = re.sub("^R.", "Rua", name)
+    name = re.sub("^B.", "Beco", name)
+    name = name.replace("IIi", "III")
+    name = name.replace("Ix", "IX")
+    name = name.replace("Xi", "XI")
+    return name
+
+def cleanAlt(altName, name=None):
     values = altName.split(";")
     output = []
     seen = set()
     for value in values:
+        if (name != None):
+            if (value == name):
+                continue
         if value not in seen:
-            output.append(value)
+            output.append(cleanName(value))
             seen.add(value)
     return ";".join(output)
 
@@ -82,7 +111,7 @@ for element in jsonFull.get("elements"):
 nodeJSON = json.loads('{"nodes": [' + ','.join(nodeList)+'] }')
 
 print(" Ways: " + str(len(wayList)) )
-print("Nodes: " +str(len(nodeList)))
+print("Nodes: " + str(len(nodeList)) )
 
 
 if len(wayList) is 0:
@@ -157,7 +186,7 @@ for Oway in wayList:
     waysAreEqual = 0
     tags = Oway["tags"]
     try:
-        Oname = tags['name']
+        Oname = cleanName(tags['name'])
     except:
         Oname = None
     try:
@@ -213,7 +242,7 @@ for Oway in wayList:
     for Sway in shapeFull['features']:
         properties = Sway['properties']
         try:
-            Sname = properties['name']
+            Sname = cleanName(properties['name'])
         except:
             Sname = None
         try:
@@ -332,7 +361,11 @@ for Oway in wayList:
             if (Oname != None): 
                 Oway['tags']['name'] = Oname
                 Ononame = None
-            if (OaltName != None): Oway['tags']['alt_name'] = cleanAlt(OaltName)
+            if (OaltName != None): Oway['tags']['alt_name'] = cleanAlt(OaltName, Oname)
+            try:
+                if (len(Oway['tags']['alt_name']) == 0): Oway['tags'].remove('alt_name')
+            except:
+                pass
             if (Oref != None): Oway['tags']['ref'] = Oref
             if (Ohighway != None): Oway['tags']['highway'] = Ohighway # if this change we have a bug!
             if (Olanes != None): 
@@ -348,19 +381,30 @@ for Oway in wayList:
             if (Oname == None):
                 if (Ononame == None and Oname == None): Ononame = "yes"
             if (Ononame != None): Oway['tags']['noname'] = Ononame
+            try:
+                if (Oway['tags']['source'] == None): Oway['tags']['source'] = "IJSN"
+                else: Oway['tags']['source'] = cleanAlt(Oway['tags']['source'] + ";IJSN")
+            except:
+                Oway['tags']['source'] = "IJSN"
+            try:
+                if (Oway['tags']['source:name'] == None): Oway['tags']['source:name'] = "IJSN"
+                else: Oway['tags']['source:name'] = cleanAlt(Oway['tags']['source:name'] + ";IJSN")
+            except:
+                Oway['tags']['source:source'] = "IJSN"
             if Oway not in modifiedWays:
                 modifiedWays.append(Oway)
             iChanged = 0
             break
 
 oldWay = MultiLineString(OverpassWays).buffer(buffer)
+thisSWay = None
 for Sway in shapeFull['features']:
     myNodes = []
     for wayNode in Sway['geometry']['coordinates']:
         myNodes.append( ( wayNode[0], wayNode[1] ) )
     thisSWay = LineString(myNodes)
     myNodes = []
-    if (thisSWay.intersects(oldWay) == False) or (thisSway.within(oldWay) == False):
+    if (thisSWay.intersects(oldWay) == True):
         for i in Sway['geometry']['coordinates']:
             proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer )
             nodeID = None
@@ -383,7 +427,9 @@ for Sway in shapeFull['features']:
         if (Sway['properties']['highway'] != None): tags.append(["highway", Sway['properties']['highway']])
         if (Sway['properties']['surface'] != None): tags.append(["surface", Sway['properties']['surface']])
         if (Sway['properties']['name'] != None): tags.append(["name", Sway['properties']['name']])
-        if (Sway['properties']['alt_name'] != None): tags.append(["alt_name", Sway['properties']['alt_name']])
+        if (Sway['properties']['alt_name'] != None): 
+            tags.append(["alt_name", cleanAlt(Sway['properties']['alt_name'], Sway['properties']['name'])])
+            if (tags["alt_name"] == ""): tags.remove("alt_name")
         if (Sway['properties']['ref'] != None): tags.append(["ref", Sway['properties']['ref']])
         if (Sway['properties']['noname'] != None): 
             if (Sway['properties']['name'] == None): tags.append(["noname", Sway['properties']['noname']])
@@ -393,21 +439,28 @@ for Sway in shapeFull['features']:
         if (Sway['properties']['bridge'] != None): tags.append(["bridge", Sway['properties']['bridge']])
         if (Sway['properties']['layer'] == None): tags.append(["layer", "1"])
         if (Sway['properties']['junction'] != None): tags.append(["junction", Sway['properties']['junction']])
+        try:
+            if (Sway['properties']['ibge_class'] != None): tag.append(["IBGE:CD_ADMINIS", Sway['properties']['ibge_class']])
+        except:
+            pass
         tags.append(["source", "IJSN"])
+        tags.append(["source:name", "IJSN"])
         newWays.append( {"id": newWayID, "nodes": myNodes, "tags": tags } )
 
 print ("New ways created: " + str(len(newWays)) + " with " + str(len(newNodes)) + " new nodes")
 print ("Ways with modified properties: " + str(len(modifiedWays)))
 print ("Individual error messages for manual control: " + str(len(manualCheck)))
-'''
-if len(newNodes) > 0:
+
+if ((len(newNodes) > 0) and addNew):
+    print ("Formating newly created nodes to XML")
     for i in newNodes:
         createXML = createXML + u'    <node id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" lat="'+unicode(i['lat'])+u'" lon="'+unicode(i['lon'])+u'" changeset="-1" version="0" visible="true" uid="0" user="0">\n'
         for j in i['tags']:
             createXML = createXML + u'      <tag k="'+unicode(j)+u'" v="'+unicode(i['tags'][j])+u'" />\n'
         createXML = createXML + u'    </node>\n'
 
-if len(newWays) > 0:
+if ((len(newWays) > 0) and addNew):
+    print ("Formating newly created ways to XML")
     for i in newWays:
         createXML = createXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="0000-00-00T00:00:00.0Z" changeset="-1" version="0" visible="true" uid="0" user="0" >\n'
         for j in i['nodes']:
@@ -415,33 +468,58 @@ if len(newWays) > 0:
         for k in i['tags']:
             createXML = createXML + u'      <tag k="'+unicode(k[0])+u'" v="'+unicode(k[1])+u'" />\n'
         createXML = createXML + u'    </way>\n'
-'''
-if len(modifiedWays) > 0:
+
+if (len(modifiedWays) > 0):
+    print ("Formating modified ways to XML")
     for i in modifiedWays:
+        try:
+            if ((i['tags']['name'] != None) and (i['tags']['alt_name'] != None)): i['tags']['alt_name'] = cleanAlt(i['tags']['alt_name'], i['tags']['name'])
+        except:
+            pass
+        try:
+            if (i['tags']['source'] != None):
+                tmp = i['tags']['source'] + ";IJSN"
+                i['tags']['source'] = cleanAlt(tmp)
+        except:
+            pass
         modifyXML = modifyXML + u'    <way id="'+unicode(i['id'])+u'" timestamp="'+i['timestamp']+u'" changeset="'+unicode(i['changeset'])+u'" version="'+unicode(i['version'])+u'" visible="true" uid="'+unicode(i['uid'])+u'" user="'+unicode(i['user'])+u'" >\n'
+        try:
+            if (i['tags']['source:name'] == None): i['tags']['source:name'] = "IJSN"
+        except:
+            pass
         for j in i['nodes']:
             modifyXML = modifyXML + u'      <nd ref="'+unicode(j)+u'" />\n'
         for k in i['tags']:
-            modifyXML = modifyXML + u"      <tag k='"+unicode(k)+u"' v='"+unicode(i['tags'][k])+u"' />\n"
+            if (len(i['tags'][k]) == 0):
+                print "Way {0}: Tag {1} have no value, skipping".format(i['id'], k)
+            elif (k == "noname"):
+                try:
+                    if (len(i['tags']['name']) > 0):
+                        print "Way {0}: Way have name, removing noname".format(i['id'])
+                except:
+                    pass
+            else:
+                modifyXML = modifyXML + u"      <tag k='"+unicode(k)+u"' v='"+unicode(i['tags'][k])+u"' />\n"
         modifyXML = modifyXML + u'    </way>\n'
 
 ## Create and Modify
 osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
-## Create only
-#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create>\n' + unicode(createXML) + u'  </create>\n  <modify>\n  </modify>\n</osmChange>'
-## Modify only
-#osmChange = u'<?xml version="1.0" encoding="UTF-8"?>\n<osmChange version="0.6" generator="IJSN importer" copyright="OpenStreetMap and contributors" attribution="http://www.openstreetmap.org/copyright" license="http://opendatacommons.org/licenses/odbl/1-0/">\n  <create> </create>\n  <modify>\n' + unicode(modifyXML) + u'  </modify>\n</osmChange>'
 
 area = shapeFull['features'][0]['properties']['municipio']
 
 #print osmChange
 
-filename = "../shp/osmC/"+area+".osc"
-f = open(filename, 'wb')
-f.write(osmChange.encode('utf8'))
-f.close()
-
 filename = "../shp/flare/"+area+".json"
 f = open(filename, 'wb')
 f.write(json.dumps( manualCheck , indent=3))
 f.close()
+
+if (addNew and (len(newWays) == 0) and (len(modifiedWays) == 0)):
+    print ("No changes in OSMChange file")
+elif (len(modifiedWays) == 0):
+    print ("No changes in OSMChange file")
+else:
+    filename = "../shp/osmC/"+area+".osc"
+    f = open(filename, 'wb')
+    f.write(osmChange.encode('utf8'))
+    f.close()
