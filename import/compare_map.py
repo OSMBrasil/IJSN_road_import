@@ -390,7 +390,7 @@ for Oway in wayList:
                 if (Oway['tags']['source:name'] == None): Oway['tags']['source:name'] = "IJSN"
                 else: Oway['tags']['source:name'] = cleanAlt(Oway['tags']['source:name'] + ";IJSN")
             except:
-                Oway['tags']['source:source'] = "IJSN"
+                Oway['tags']['source:name'] = "IJSN"
             if Oway not in modifiedWays:
                 modifiedWays.append(Oway)
             iChanged = 0
