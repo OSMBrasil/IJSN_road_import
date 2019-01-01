@@ -49,4 +49,5 @@ for i in "Afonso Cláudio" "Alegre" "Alfredo Chaves" "Alto Rio Novo" "Anchieta" 
     cp "../shp/osmC/$k.osc" "../shp/osmC/$k.osc~" 2>/dev/null
     ./compare_map.py "../shp/json/$i.json" "../shp/osm/$i.json"
 #    exit 0
+    ../script/upload/upload.py "../shp/osmC/$k.osc" -c no
 done

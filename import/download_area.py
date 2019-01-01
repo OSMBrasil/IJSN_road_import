@@ -54,7 +54,7 @@ while city is None:
 highwayList = [ "road", "motorway", "motorway_link", "trunk", "trunk_link", "primary", "primary_link", "secundary", "secundary_link", "tertiary", "tertiary_link", "unclassified", "residential", "living_street", "service", "pedestrian", "bus_guideway", "escape", "raceway", "track", "path", "footway", "cycleway", "bridleway", "steps", "proposed", "construction" ]
 #highwayList = [ "road", "trunk", "trunk_link", "primary", "primary_link", "secundary", "tertiary", "unclassified", "residential", "service", "track" ]
 #highwayList = [ "road", "trunk", "primary", "secundary", "tertiary", "unclassified", "residential" ]
-highwayList = [ "road", "tertiary", "unclassified", "residential" ]
+#highwayList = [ "road", "tertiary", "unclassified", "residential" ]
 
 #api = overpass.API(timeout=600,maxsize=1073741824)
 api = overpass.API(timeout=600)

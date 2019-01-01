@@ -287,27 +287,23 @@ for Oway in wayList:
         thisSWay = LineString(myNodes)
         # compare the two ways
         if thisOWay.within(thisSWay.buffer(buffer)):
-            #print ("O", end=''),
             waysAreEqual = 1
-#        if thisSWay.within(thisOWay.buffer(buffer)):
-#            print ("S", end=''),
         if thisOWay.almost_equals(thisSWay, 5):
-            #print ("5", end=''),
             waysAreEqual = 1
         if thisOWay.almost_equals(thisSWay, 4):
-            #print ("4", end=''),
             waysAreEqual = 1
         if thisOWay.almost_equals(thisSWay, 3):
-            #print ("3", end=''),
             waysAreEqual = 1
 #        if thisOWay.almost_equals(thisSWay, 2):
-#            print ("2", end=''),
-#        if thisOWay.intersects(thisSWay):
-#            print ("i", end=''),
-#        if thisOWay.touches(thisSWay):
-#            print ("t", end=''),
-#        if thisOWay.crosses(thisSWay):
-#            print ("c", end=''),
+#            if (waysAreEqual != 1): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "way is almost equal to shapefile data"}'))
+        if thisOWay.intersects(thisSWay):
+            if (waysAreEqual != 1): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "way is intersecting shapefile data"}'))
+        if thisOWay.touches(thisSWay):
+            if (waysAreEqual != 1): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "way is touching shapefile data"}'))
+        if thisOWay.crosses(thisSWay):
+            if (waysAreEqual != 1): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "way is crossing shapefile data"}'))
+#        if thisSWay.within(thisOWay.buffer(buffer)):
+#            if (waysAreEqual != 1): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "shapefile data is within way"}'))
         # Let us build a new object, something have changed
         if (waysAreEqual == 1):
             if (Sname != Oname):
@@ -319,29 +315,29 @@ for Oway in wayList:
                 Oname = Sname
             if (SaltName != None):
                 iChanged = 1
-                if (OaltName == None): OaltName = SaltName
+                if (OaltName == None): OaltName = cleanAlt(SaltName)
                 else: OaltName = cleanAlt(OaltName + ";" + SaltName)
             if (Sref != None):
                 if (Oref == None):
                     Oref = Sref
                     iChanged = 1
-                elif (Oref != Sref): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "ref='+str(Oref)+' not equal ' +str(Sref)+'"}'))
+                elif (Oref != Sref): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "ref='+str(Oref)+' not equal ' +str(Sref)+'"}'))
             if (Ohighway == "road"):
                 Ohighway = Shighway
                 iChanged = 1
-            if (Ohighway != Shighway): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "highway='+str(Ohighway)+' not equal ' +str(Shighway)+'"}'))
+            if (Ohighway != Shighway): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "highway='+str(Ohighway)+' not equal ' +str(Shighway)+'"}'))
             if (Osurface == None):
                 if (Ssurface != None):
                     Osurface = Ssurface
                     iChanged = 1
             else:
-                if (Osurface != Ssurface): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "surface='+str(Osurface)+' not equal '+str(Ssurface)+'"}'))
+                if (Osurface != Ssurface): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "surface='+str(Osurface)+' not equal '+str(Ssurface)+'"}'))
             if (Sbridge != None):
                 if (Obridge == None):
                     Obridge = Sbridge
                     iChanged = 1
                 else:
-                    if (Obridge != Sbridge): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": bridge='+str(Obridge)+' not equal '+str(Sbridge)+'"}'))
+                    if (Obridge != Sbridge): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": bridge='+str(Obridge)+' not equal '+str(Sbridge)+'"}'))
             if (Sjunction != None):
                 if (Ojunction == None):
                     Ojunction = Sjunction
@@ -351,7 +347,7 @@ for Oway in wayList:
                     Olanes = Slanes
                     iChanged = 1
             else:
-                if (Olanes != Slanes): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "reason": "lanes='+str(Olanes)+' not equal ' +str(Slanes)+'"}'))
+                if (Olanes != Slanes): manualCheck.append(json.loads('{"id": '+str(Oway['id'])+', "url": "http://osm.org/way/'+str(Oway['id'])+'", "reason": "lanes='+str(Olanes)+' not equal ' +str(Slanes)+'"}'))
             if (Slayer != None):
                 if (Olayer == None):
                     Olayer = Slayer
@@ -378,8 +374,7 @@ for Oway in wayList:
             if (Olayer != None): Oway['tags']['layer'] = Olayer
             if (Ojunction != None): Oway['tags']['junction'] = Ojunction
             if (Osurface != None): Oway['tags']['surface'] = Osurface
-            if (Oname == None):
-                if (Ononame == None and Oname == None): Ononame = "yes"
+            if (Oname == None) and (Ononame == None): Ononame = "yes"
             if (Ononame != None): Oway['tags']['noname'] = Ononame
             try:
                 if (Oway['tags']['source'] == None): Oway['tags']['source'] = "IJSN"
@@ -387,10 +382,15 @@ for Oway in wayList:
             except:
                 Oway['tags']['source'] = "IJSN"
             try:
-                if (Oway['tags']['source:name'] == None): Oway['tags']['source:name'] = "IJSN"
-                else: Oway['tags']['source:name'] = cleanAlt(Oway['tags']['source:name'] + ";IJSN")
+                if (len(Oway['tags']['name']) > 0) and (Oway['tags']['name'] == Sname):
+                    if (Oway['tags']['source:name'] == None): Oway['tags']['source:name'] = "IJSN"
+                    else: Oway['tags']['source:name'] = cleanAlt(Oway['tags']['source:name'] + ";IJSN")
             except:
-                Oway['tags']['source:name'] = "IJSN"
+                try:
+                    if (len(Oway['tags']['name']) > 0) and (Oway['tags']['name'] == Sname):
+                        Oway['tags']['source:name'] = "IJSN"
+                except:
+                    pass
             if Oway not in modifiedWays:
                 modifiedWays.append(Oway)
             iChanged = 0
@@ -404,7 +404,7 @@ for Sway in shapeFull['features']:
         myNodes.append( ( wayNode[0], wayNode[1] ) )
     thisSWay = LineString(myNodes)
     myNodes = []
-    if (thisSWay.intersects(oldWay) == True):
+    if (thisSWay.intersects(oldWay) == False) and (thisSWay.within(oldWay) == False) and (thisSWay.crosses(oldWay) == False):
         for i in Sway['geometry']['coordinates']:
             proximity = Point( ( float(i[0]), float(i[1]) ) ).buffer( buffer )
             nodeID = None
