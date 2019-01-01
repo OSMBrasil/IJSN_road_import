@@ -110,10 +110,10 @@ class OSM_API(object):
         try_no_auth = 0
 
         if not try_no_auth and not self.username:
-            raise HTTPError(0, "Need a username")
+            raise HTTPError(0, "Need a username\n")
 
         try:
-            self.msg("connecting")
+            self.msg("connecting\n")
             conn = httplib.HTTPConnection(host, port)
 #            conn.set_debuglevel(10)
 
@@ -181,8 +181,8 @@ class OSM_API(object):
 
     def upload(self, change):
         if self.changeset is None:
-            raise RuntimeError("Changeset not opened")
-        self.progress_msg = "Now I'm sending changes"
+            raise RuntimeError("Changeset not opened\n")
+        self.progress_msg = "Now I'm sending changes\n"
         self.msg("")
         for operation in change:
             if operation.tag not in ("create", "modify", "delete"):
@@ -192,19 +192,19 @@ class OSM_API(object):
         body = ElementTree.tostring(change, "utf-8")
         reply = self._run_request("POST", "/api/0.6/changeset/%i/upload"
                                                 % (self.changeset,), body, 1)
-        self.msg("done.")
+        self.msg("done.\n")
         sys.stderr.write("\n")
         return reply
 
     def close_changeset(self):
         if self.changeset is None:
-            raise RuntimeError("Changeset not opened")
+            raise RuntimeError("Changeset not opened\n")
         self.progress_msg = "Closing"
         self.msg("")
         reply = self._run_request("PUT", "/api/0.6/changeset/%i/close"
                                                     % (self.changeset,))
         self.changeset = None
-        self.msg("done, too.")
+        self.msg("done, too.\n")
         sys.stderr.write("\n")
 
 try:
@@ -327,7 +327,7 @@ try:
         if 'confirm' in param:
             sure = param['confirm']
         else:
-            sys.stderr.write("Are you sure you want to send these changes?")
+            sys.stderr.write("Are you sure you want to send these changes? ")
             sure = input()
         if sure.lower() not in ("y", "yes"):
             sys.stderr.write("Skipping...\n\n")
