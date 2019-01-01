@@ -41,7 +41,7 @@ class HTTPError(Exception):
     pass
 
 class OSM_API(object):
-    url = 'http://api.openstreetmap.org/'
+    url = 'https://www.openstreetmap.org/'
     def __init__(self, username = None, password = None):
         if username and password:
             self.username = username
@@ -92,8 +92,8 @@ class OSM_API(object):
     def _run_request(self, method, url, body = None, progress = 0, content_type = "text/xml"):
         url = urlparse.urljoin(self.url, url)
         purl = urlparse.urlparse(url)
-        if purl.scheme != "http":
-            raise ValueError("Unsupported url scheme: %r" % (purl.scheme,))
+#        if purl.scheme != "http":
+#            raise ValueError("Unsupported url scheme: %r" % (purl.scheme,))
         if ":" in purl.netloc:
             host, port = purl.netloc.split(":", 1)
             port = int(port)
@@ -119,14 +119,14 @@ class OSM_API(object):
 
             if try_no_auth:
                 self.request(conn, method, url, body, headers, progress)
-                self.msg("waiting for status")
+                self.msg("waiting for status\n")
                 response = conn.getresponse()
 
             if not try_no_auth or (response.status == httplib.UNAUTHORIZED and
                     self.username):
                 if try_no_auth:
                     conn.close()
-                    self.msg("re-connecting")
+                    self.msg("re-connecting\n")
                     conn = httplib.HTTPConnection(host, port)
 #                    conn.set_debuglevel(10)
 
@@ -136,16 +136,16 @@ class OSM_API(object):
                         # ^ Seems to be broken in python3 (even the raw
                         # documentation examples don't run for base64)
                 self.request(conn, method, url, body, headers, progress)
-                self.msg("waiting for status")
+                self.msg("waiting for status\n")
                 response = conn.getresponse()
 
             if response.status == httplib.OK:
-                self.msg("reading response")
+                self.msg("reading response\n")
                 sys.stderr.flush()
                 response_body = response.read()
             else:
                 err = response.read()
-                raise HTTPError(response.status, "%03i: %s (%s)" % (
+                raise HTTPError(response.status, "%03i: %s (%s)\n" % (
                     response.status, response.reason, err), err)
         finally:
             conn.close()
@@ -160,7 +160,10 @@ class OSM_API(object):
         tree = ElementTree.ElementTree(root)
         element = ElementTree.SubElement(root, "changeset")
         ElementTree.SubElement(element, "tag", {"k": "created_by", "v": created_by})
-        ElementTree.SubElement(element, "tag", {"k": "comment", "v": "IJSN Road Import: see https://github.com/OSMBrasil/IJSN_road_import and <mailing-list> - " + comment})
+        if (comment != None):
+            ElementTree.SubElement(element, "tag", {"k": "comment", "v": "IJSN Road Import: see https://github.com/OSMBrasil/IJSN_road_import and <mailing-list> - " + comment})
+        else:
+            ElementTree.SubElement(element, "tag", {"k": "comment", "v": "IJSN Road Import: see https://github.com/OSMBrasil/IJSN_road_import and <mailing-list>"})
         ElementTree.SubElement(element, "tag", {"k": "import", "v": "yes"})
         ElementTree.SubElement(element, "tag", {"k": "source", "v": "IJSN"})
         ElementTree.SubElement(element, "tag", {"k": "sources:external", "v": "DER-ES;SEAG-ES;CGEO"})
@@ -217,6 +220,14 @@ try:
 
     filenames = []
     param = {}
+    try:
+        param['user'] = os.getenv("OSM_USER")
+    except:
+        pass
+    try:
+        param['pass'] = os.getenv("OSM_PASSWORD")
+    except:
+        pass
     num = 0
     skip = 0
     for arg in sys.argv[1:]:
@@ -301,14 +312,14 @@ try:
         if not comment:
             if 'comment' in param:
                 comment = param['comment']
-            else:
-                comment = input("Your comment to %r: " % (filename,))
-            if not comment:
-                sys.exit(1)
-            #try:
-            #    comment = comment.decode(locale.getlocale()[1])
-            #except TypeError:
-            #    comment = comment.decode("UTF-8")
+#            else:
+#                comment = input("Your comment to %r: " % (filename,))
+#            if not comment:
+#                sys.exit(1)
+#            try:
+#                comment = comment.decode(locale.getlocale()[1])
+#            except TypeError:
+#                comment = comment.decode("UTF-8")
 
         sys.stderr.write("     File: %r\n" % (filename,))
         sys.stderr.write("  Comment: %s\n" % (comment,))
